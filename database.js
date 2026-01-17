@@ -1,0 +1,1501 @@
+// ============================================
+// DTH DRILL CONSUMABLES DATABASE
+// Multi-Supplier Database with Online Resources
+// ============================================
+
+const SUPPLIERS = {
+    'sandvik': {
+        name: 'Sandvik Mining & Rock Solutions',
+        website: 'https://www.mining.sandvik',
+        logo: 'https://www.mining.sandvik/globalassets/00-global-assets/brand/sandvik-logo.svg',
+        catalogUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/',
+        country: 'Sweden',
+        notes: 'Premium DTH tools with PowerCarbide technology'
+    },
+    'epiroc': {
+        name: 'Epiroc',
+        website: 'https://www.epiroc.com',
+        logo: 'https://www.epiroc.com/content/dam/epiroc/master-site-global/epiroc-logo.svg',
+        catalogUrl: 'https://www.epiroc.com/en-au/products/rock-drilling-tools/down-the-hole-drilling-tools',
+        country: 'Sweden',
+        notes: 'COP M-Series hammers - fastest DTH technology'
+    },
+    'mincon': {
+        name: 'Mincon Group',
+        website: 'https://mincon.com',
+        logo: 'https://mincon.com/wp-content/uploads/2023/11/mincon-logo.svg',
+        catalogUrl: 'https://mincon.com/products/',
+        country: 'Ireland',
+        notes: 'MP-Series next-generation hammers'
+    },
+    'robit': {
+        name: 'Robit Plc',
+        website: 'https://www.robitgroup.com',
+        logo: 'https://www.robitgroup.com/wp-content/uploads/2020/05/robit-logo.svg',
+        catalogUrl: 'https://www.robitgroup.com/products/dth-drilling/',
+        country: 'Finland',
+        notes: 'H-Series modular hammers, casing systems'
+    },
+    'numa': {
+        name: 'Numa Tool Company',
+        website: 'https://www.numahammers.com',
+        logo: '',
+        catalogUrl: 'https://www.numahammers.com/products/',
+        country: 'USA',
+        notes: 'Champion and Patriot series'
+    },
+    'center_rock': {
+        name: 'Center Rock Inc',
+        website: 'https://www.centerrockinc.com',
+        logo: '',
+        catalogUrl: 'https://www.centerrockinc.com/products/',
+        country: 'USA',
+        notes: 'CRI DTH hammers'
+    },
+    'custom': {
+        name: 'Custom/Manual Entry',
+        website: '',
+        logo: '',
+        catalogUrl: '',
+        country: '',
+        notes: 'User-added items'
+    }
+};
+
+// ============================================
+// HAMMERS DATABASE
+// ============================================
+const HAMMERS_DB = [
+    // SANDVIK RH460 Series
+    {
+        id: 'SVK-RH460-4-QLX4',
+        supplier: 'sandvik',
+        partNumber: 'BG00358362',
+        name: 'RH460 4" QLX4',
+        series: 'RH460',
+        size: 4,
+        shank: 'QLX40',
+        topSub: 'API 2-3/8" Reg Pin',
+        holeSizeMin: 105,
+        holeSizeMax: 127,
+        airConsumption: 300,
+        maxPressure: 30,
+        weight: 28,
+        length: 680,
+        od: 98,
+        efficiency: 0.92,
+        cost: 3251.29,
+        lifeMetres: 12000,
+        notes: 'Wall control & production 4" hammer',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/rh460.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/rh460/',
+        rigCompatibility: ['D65', 'FlexiROC D60', 'SmartROC D65']
+    },
+    {
+        id: 'SVK-RH460G-5',
+        supplier: 'sandvik',
+        partNumber: '32-4655-GQA-04C',
+        name: 'RH460G 5"',
+        series: 'RH460',
+        size: 5,
+        shank: 'API 3-1/2"',
+        topSub: 'API 3-1/2" Reg Pin',
+        holeSizeMin: 127,
+        holeSizeMax: 152,
+        airConsumption: 425,
+        maxPressure: 30,
+        weight: 42,
+        length: 780,
+        od: 123,
+        efficiency: 0.93,
+        cost: 4866.00,
+        lifeMetres: 10000,
+        notes: 'Mid-size production 5" hammer',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/rh460.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/rh460/',
+        rigCompatibility: ['D65', 'FlexiROC D60']
+    },
+    {
+        id: 'SVK-RH460G-6',
+        supplier: 'sandvik',
+        partNumber: '32-4665-GQA-04C',
+        name: 'RH460G 6"',
+        series: 'RH460',
+        size: 6,
+        shank: 'API 3-1/2"',
+        topSub: 'API 3-1/2" Reg Pin',
+        holeSizeMin: 152,
+        holeSizeMax: 178,
+        airConsumption: 750,
+        maxPressure: 30,
+        weight: 68,
+        length: 920,
+        od: 149,
+        efficiency: 0.94,
+        cost: 5565.06,
+        lifeMetres: 9000,
+        notes: 'Primary production hammer for 165mm',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/rh460.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/rh460/',
+        rigCompatibility: ['D65', 'FlexiROC D65']
+    },
+    // SANDVIK RH510 Series
+    {
+        id: 'SVK-RH510R-4',
+        supplier: 'sandvik',
+        partNumber: '32-5140-RMA-16S',
+        name: 'RH510R 4"',
+        series: 'RH510',
+        size: 4,
+        shank: 'API 2-3/8"',
+        topSub: 'API 2-3/8" Reg Pin',
+        holeSizeMin: 105,
+        holeSizeMax: 127,
+        airConsumption: 320,
+        maxPressure: 28,
+        weight: 26,
+        length: 650,
+        od: 98,
+        efficiency: 0.88,
+        cost: 2097.06,
+        lifeMetres: 10000,
+        notes: 'Economy 4" option',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/rh510.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/rh510/',
+        rigCompatibility: ['D65', 'FlexiROC D50']
+    },
+    {
+        id: 'SVK-RH510G-6',
+        supplier: 'sandvik',
+        partNumber: '32-5165-GMA-04C',
+        name: 'RH510G 6"',
+        series: 'RH510',
+        size: 6,
+        shank: 'API 3-1/2"',
+        topSub: 'API 3-1/2" Reg Pin',
+        holeSizeMin: 152,
+        holeSizeMax: 178,
+        airConsumption: 700,
+        maxPressure: 28,
+        weight: 62,
+        length: 880,
+        od: 149,
+        efficiency: 0.90,
+        cost: 3640.69,
+        lifeMetres: 8000,
+        notes: 'Standard 6" production',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/rh510.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/rh510/',
+        rigCompatibility: ['D65', 'FlexiROC D60']
+    },
+    // SANDVIK RH560 Series
+    {
+        id: 'SVK-RH560G-4',
+        supplier: 'sandvik',
+        partNumber: '32-5645-GTA-16S',
+        name: 'RH560G 4"',
+        series: 'RH560',
+        size: 4,
+        shank: 'API 2-3/8"',
+        topSub: 'API 2-3/8" Reg Pin',
+        holeSizeMin: 105,
+        holeSizeMax: 130,
+        airConsumption: 350,
+        maxPressure: 30,
+        weight: 30,
+        length: 700,
+        od: 100,
+        efficiency: 0.94,
+        cost: 4294.77,
+        lifeMetres: 12000,
+        notes: 'Premium 4", +15% pen rate',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/rh560.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/rh560/',
+        rigCompatibility: ['D65', 'SmartROC D65']
+    },
+    {
+        id: 'SVK-RH560G-6',
+        supplier: 'sandvik',
+        partNumber: '32-5665-GQA-04C',
+        name: 'RH560G 6"',
+        series: 'RH560',
+        size: 6,
+        shank: 'API 3-1/2"',
+        topSub: 'API 3-1/2" Reg Pin',
+        holeSizeMin: 152,
+        holeSizeMax: 180,
+        airConsumption: 800,
+        maxPressure: 30,
+        weight: 72,
+        length: 950,
+        od: 152,
+        efficiency: 0.95,
+        cost: 6119.48,
+        lifeMetres: 11000,
+        notes: 'Premium 6", enhanced air cycle',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/rh560.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/rh560/',
+        rigCompatibility: ['D65', 'SmartROC D65']
+    },
+    {
+        id: 'SVK-RH560G-6-OP',
+        supplier: 'sandvik',
+        partNumber: 'BG01576792',
+        name: 'RH560G 6" OP Spec',
+        series: 'RH560',
+        size: 6,
+        shank: 'API 3-1/2"',
+        topSub: 'API 3-1/2" Reg Pin',
+        holeSizeMin: 152,
+        holeSizeMax: 180,
+        airConsumption: 820,
+        maxPressure: 30,
+        weight: 75,
+        length: 960,
+        od: 152,
+        efficiency: 0.96,
+        cost: 11023.10,
+        lifeMetres: 14000,
+        notes: 'Owner-preferred, maximum life',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/rh560.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/rh560/',
+        rigCompatibility: ['D65', 'SmartROC D65']
+    },
+    // SANDVIK RH570 Series (Malleo)
+    {
+        id: 'SVK-RH570-6.5',
+        supplier: 'sandvik',
+        partNumber: '32-5765-SFA-04C',
+        name: 'RH570 6.5" HD',
+        series: 'RH570',
+        size: 6.5,
+        shank: 'API 3-1/2"',
+        topSub: 'API 3-1/2" Reg Pin',
+        holeSizeMin: 165,
+        holeSizeMax: 200,
+        airConsumption: 900,
+        maxPressure: 30,
+        weight: 85,
+        length: 1020,
+        od: 165,
+        efficiency: 0.93,
+        cost: 11114.21,
+        lifeMetres: 10000,
+        notes: 'Heavy duty 6.5" for large holes - Malleo technology',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/malleo-rh570.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/malleo-rh570/',
+        rigCompatibility: ['D65', 'SmartROC D65']
+    },
+    // SANDVIK 8" Hammers for MD6250
+    {
+        id: 'SVK-RH460-8',
+        supplier: 'sandvik',
+        partNumber: '32-4680-SQA-19S',
+        name: 'RH460 8" Std',
+        series: 'RH460-8',
+        size: 8,
+        shank: 'QL80',
+        topSub: 'API 4-1/2" Reg Pin',
+        holeSizeMin: 200,
+        holeSizeMax: 270,
+        airConsumption: 1050,
+        maxPressure: 35,
+        weight: 165,
+        length: 1320,
+        od: 200,
+        efficiency: 0.92,
+        cost: 11039.00,
+        lifeMetres: 9000,
+        notes: 'MD6250 Standard 8" hammer',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/rh460.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/rh460/',
+        rigCompatibility: ['MD6250', 'MD6310', 'PV271']
+    },
+    {
+        id: 'SVK-RH460G-8',
+        supplier: 'sandvik',
+        partNumber: '32-4685-GQA-19C',
+        name: 'RH460G 8" Premium',
+        series: 'RH460G-8',
+        size: 8,
+        shank: 'QL80',
+        topSub: 'API 4-1/2" Reg Pin',
+        holeSizeMin: 200,
+        holeSizeMax: 270,
+        airConsumption: 1100,
+        maxPressure: 35,
+        weight: 170,
+        length: 1350,
+        od: 200,
+        efficiency: 0.95,
+        cost: 12048.00,
+        lifeMetres: 12000,
+        notes: 'MD6250 Premium 8" - 33% longer life',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-hammers/rh460.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-hammers/rh460/',
+        rigCompatibility: ['MD6250', 'MD6310', 'PV271']
+    },
+    
+    // EPIROC COP M-Series
+    {
+        id: 'EPI-COPM4',
+        supplier: 'epiroc',
+        partNumber: 'COP M4',
+        name: 'COP M4 4"',
+        series: 'COP M',
+        size: 4,
+        shank: 'COP 44',
+        topSub: 'API 2-3/8" Reg Pin',
+        holeSizeMin: 100,
+        holeSizeMax: 125,
+        airConsumption: 280,
+        maxPressure: 30,
+        weight: 22,
+        length: 620,
+        od: 95,
+        efficiency: 0.94,
+        cost: 3800.00,
+        lifeMetres: 11000,
+        notes: 'Fastest 4" hammer - 25% more compact',
+        imageUrl: 'https://www.epiroc.com/content/dam/epiroc/rock-drilling-tools/products/cop-m-series/cop-m4-hammer.png',
+        productUrl: 'https://www.epiroc.com/en-au/products/rock-drilling-tools/down-the-hole-drilling-tools/cop-m-series',
+        rigCompatibility: ['SmartROC D65', 'FlexiROC D60']
+    },
+    {
+        id: 'EPI-COPM5',
+        supplier: 'epiroc',
+        partNumber: 'COP M5',
+        name: 'COP M5 5"',
+        series: 'COP M',
+        size: 5,
+        shank: 'COP 54',
+        topSub: 'API 2-3/8" Reg Pin',
+        holeSizeMin: 127,
+        holeSizeMax: 152,
+        airConsumption: 400,
+        maxPressure: 30,
+        weight: 38,
+        length: 720,
+        od: 121,
+        efficiency: 0.95,
+        cost: 5200.00,
+        lifeMetres: 10000,
+        notes: 'High frequency 5" hammer',
+        imageUrl: 'https://www.epiroc.com/content/dam/epiroc/rock-drilling-tools/products/cop-m-series/cop-m5-hammer.png',
+        productUrl: 'https://www.epiroc.com/en-au/products/rock-drilling-tools/down-the-hole-drilling-tools/cop-m-series',
+        rigCompatibility: ['SmartROC D65', 'FlexiROC D60']
+    },
+    {
+        id: 'EPI-COPM6',
+        supplier: 'epiroc',
+        partNumber: 'COP M6',
+        name: 'COP M6 6"',
+        series: 'COP M',
+        size: 6,
+        shank: 'COP 64',
+        topSub: 'API 3-1/2" Reg Pin',
+        holeSizeMin: 152,
+        holeSizeMax: 178,
+        airConsumption: 720,
+        maxPressure: 30,
+        weight: 58,
+        length: 880,
+        od: 146,
+        efficiency: 0.96,
+        cost: 7500.00,
+        lifeMetres: 10000,
+        notes: 'Fastest 6" DTH hammer on market',
+        imageUrl: 'https://www.epiroc.com/content/dam/epiroc/rock-drilling-tools/products/cop-m-series/cop-m6-hammer.png',
+        productUrl: 'https://www.epiroc.com/en-au/products/rock-drilling-tools/down-the-hole-drilling-tools/cop-m-series',
+        rigCompatibility: ['SmartROC D65', 'FlexiROC D65']
+    },
+    {
+        id: 'EPI-COPM7',
+        supplier: 'epiroc',
+        partNumber: 'COP M7',
+        name: 'COP M7 7"',
+        series: 'COP M',
+        size: 7,
+        shank: 'COP 74',
+        topSub: 'API 4-1/2" Reg Pin',
+        holeSizeMin: 178,
+        holeSizeMax: 229,
+        airConsumption: 950,
+        maxPressure: 35,
+        weight: 120,
+        length: 1150,
+        od: 178,
+        efficiency: 0.95,
+        cost: 10500.00,
+        lifeMetres: 10000,
+        notes: '27% faster than COP M6 with 203mm bits',
+        imageUrl: 'https://www.epiroc.com/content/dam/epiroc/rock-drilling-tools/products/cop-m-series/cop-m7-hammer.png',
+        productUrl: 'https://www.epiroc.com/en-au/products/rock-drilling-tools/down-the-hole-drilling-tools/cop-m-series',
+        rigCompatibility: ['MD6250', 'PV271', 'DM45']
+    },
+    {
+        id: 'EPI-COPM8',
+        supplier: 'epiroc',
+        partNumber: 'COP M8',
+        name: 'COP M8 8"',
+        series: 'COP M',
+        size: 8,
+        shank: 'COP 84',
+        topSub: 'API 4-1/2" Reg Pin',
+        holeSizeMin: 216,
+        holeSizeMax: 270,
+        airConsumption: 1150,
+        maxPressure: 35,
+        weight: 165,
+        length: 1320,
+        od: 200,
+        efficiency: 0.95,
+        cost: 13500.00,
+        lifeMetres: 11000,
+        notes: 'Most powerful 8" hammer ever',
+        imageUrl: 'https://www.epiroc.com/content/dam/epiroc/rock-drilling-tools/products/cop-m-series/cop-m8-hammer.png',
+        productUrl: 'https://www.epiroc.com/en-au/products/rock-drilling-tools/down-the-hole-drilling-tools/cop-m-series',
+        rigCompatibility: ['MD6250', 'MD6310', 'PV271', 'DM45']
+    },
+    
+    // MINCON MP-Series
+    {
+        id: 'MIN-MP40',
+        supplier: 'mincon',
+        partNumber: 'MP40',
+        name: 'MP40 4"',
+        series: 'MP',
+        size: 4,
+        shank: 'QL40',
+        topSub: 'API 2-3/8" Reg Pin',
+        holeSizeMin: 105,
+        holeSizeMax: 130,
+        airConsumption: 290,
+        maxPressure: 30,
+        weight: 25,
+        length: 660,
+        od: 97,
+        efficiency: 0.91,
+        cost: 3100.00,
+        lifeMetres: 10000,
+        notes: 'Next-gen 4" hammer - low air consumption',
+        imageUrl: 'https://mincon.com/wp-content/uploads/2023/03/MP40-Hammer.png',
+        productUrl: 'https://mincon.com/product/4-inch-dth-hammers/',
+        rigCompatibility: ['D65', 'FlexiROC D50']
+    },
+    {
+        id: 'MIN-MP60',
+        supplier: 'mincon',
+        partNumber: 'MP60',
+        name: 'MP60 6"',
+        series: 'MP',
+        size: 6,
+        shank: 'QL60',
+        topSub: 'API 3-1/2" Reg Pin',
+        holeSizeMin: 152,
+        holeSizeMax: 178,
+        airConsumption: 680,
+        maxPressure: 30,
+        weight: 60,
+        length: 870,
+        od: 146,
+        efficiency: 0.93,
+        cost: 5800.00,
+        lifeMetres: 9500,
+        notes: 'High efficiency 6" for mining',
+        imageUrl: 'https://mincon.com/wp-content/uploads/2023/03/MP60-Hammer.png',
+        productUrl: 'https://mincon.com/product/6-7-inch-dth-hammers/',
+        rigCompatibility: ['D65', 'SmartROC D65']
+    },
+    {
+        id: 'MIN-MP80',
+        supplier: 'mincon',
+        partNumber: 'MP80',
+        name: 'MP80 8"',
+        series: 'MP',
+        size: 8,
+        shank: 'QL80',
+        topSub: 'API 4-1/2" Reg Pin',
+        holeSizeMin: 200,
+        holeSizeMax: 270,
+        airConsumption: 1000,
+        maxPressure: 35,
+        weight: 155,
+        length: 1280,
+        od: 197,
+        efficiency: 0.93,
+        cost: 10800.00,
+        lifeMetres: 9000,
+        notes: 'Production 8" hammer',
+        imageUrl: 'https://mincon.com/wp-content/uploads/2023/03/MP80-Hammer.png',
+        productUrl: 'https://mincon.com/product/8-inch-dth-hammers/',
+        rigCompatibility: ['MD6250', 'PV271', 'DM45']
+    },
+    
+    // ROBIT H-Series
+    {
+        id: 'ROB-H4',
+        supplier: 'robit',
+        partNumber: 'H4-QL40',
+        name: 'H4 4" QL40',
+        series: 'H',
+        size: 4,
+        shank: 'QL40',
+        topSub: 'API 2-3/8" Reg Pin',
+        holeSizeMin: 105,
+        holeSizeMax: 130,
+        airConsumption: 310,
+        maxPressure: 30,
+        weight: 27,
+        length: 670,
+        od: 98,
+        efficiency: 0.90,
+        cost: 2900.00,
+        lifeMetres: 9500,
+        notes: 'Modular 4" - 25% lower fuel consumption',
+        imageUrl: 'https://www.robitgroup.com/wp-content/uploads/2020/05/H4-hammer.png',
+        productUrl: 'https://www.robitgroup.com/products/dth-drilling/',
+        rigCompatibility: ['D65', 'FlexiROC D50']
+    },
+    {
+        id: 'ROB-H6',
+        supplier: 'robit',
+        partNumber: 'H6-QL60',
+        name: 'H6 6" QL60',
+        series: 'H',
+        size: 6,
+        shank: 'QL60',
+        topSub: 'API 3-1/2" Reg Pin',
+        holeSizeMin: 152,
+        holeSizeMax: 180,
+        airConsumption: 720,
+        maxPressure: 30,
+        weight: 65,
+        length: 890,
+        od: 149,
+        efficiency: 0.91,
+        cost: 5200.00,
+        lifeMetres: 8500,
+        notes: 'Modular 6" with HD/SL options',
+        imageUrl: 'https://www.robitgroup.com/wp-content/uploads/2020/05/H6-hammer.png',
+        productUrl: 'https://www.robitgroup.com/products/dth-drilling/',
+        rigCompatibility: ['D65', 'SmartROC D65']
+    },
+    {
+        id: 'ROB-H8',
+        supplier: 'robit',
+        partNumber: 'H8-QL80',
+        name: 'H8 8" QL80',
+        series: 'H',
+        size: 8,
+        shank: 'QL80',
+        topSub: 'API 4-1/2" Reg Pin',
+        holeSizeMin: 203,
+        holeSizeMax: 254,
+        airConsumption: 1050,
+        maxPressure: 35,
+        weight: 172,
+        length: 1245,
+        od: 200,
+        efficiency: 0.91,
+        cost: 9800.00,
+        lifeMetres: 8500,
+        notes: 'Modular 8" - MX/HF assemblies available',
+        imageUrl: 'https://www.robitgroup.com/wp-content/uploads/2020/05/H8-hammer.png',
+        productUrl: 'https://www.robitgroup.com/products/dth-drilling/',
+        rigCompatibility: ['MD6250', 'PV271']
+    }
+];
+
+// ============================================
+// BITS DATABASE
+// ============================================
+const BITS_DB = [
+    // SANDVIK QLX40 BITS - 115mm
+    {
+        id: 'SVK-QLX40-115-XT48',
+        supplier: 'sandvik',
+        partNumber: '42-4G1A115-S48k',
+        name: 'QLX40 115mm CC XT48',
+        shank: 'QLX40',
+        diameter: 115,
+        face: 'Concave',
+        faceCode: 'CC 2/8',
+        carbide: 'XT48',
+        carbideGrade: 'Standard',
+        gaugeButtons: 8,
+        faceButtons: 2,
+        buttonDia: 13,
+        airHoles: 2,
+        weight: 4.8,
+        efficiency: 0.85,
+        cost: 568.32,
+        lifeMetres: 900,
+        notes: 'Wall control standard',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/dth-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460-4-QLX4', 'SVK-RH510R-4', 'SVK-RH560G-4']
+    },
+    {
+        id: 'SVK-QLX40-115-DP65',
+        supplier: 'sandvik',
+        partNumber: '42-4G1A115-S65',
+        name: 'QLX40 115mm CC DP65',
+        shank: 'QLX40',
+        diameter: 115,
+        face: 'Concave',
+        faceCode: 'CC 2/8',
+        carbide: 'DP65',
+        carbideGrade: 'Dual Property',
+        gaugeButtons: 8,
+        faceButtons: 2,
+        buttonDia: 13,
+        airHoles: 2,
+        weight: 4.8,
+        efficiency: 0.87,
+        cost: 617.03,
+        lifeMetres: 1000,
+        notes: 'Premium carbide wall control',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/dth-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460-4-QLX4', 'SVK-RH510R-4', 'SVK-RH560G-4']
+    },
+    // SANDVIK QLX40 BITS - 127mm
+    {
+        id: 'SVK-QLX40-127-XT48',
+        supplier: 'sandvik',
+        partNumber: '42-4G1A127-S48',
+        name: 'QLX40 127mm CC XT48',
+        shank: 'QLX40',
+        diameter: 127,
+        face: 'Concave',
+        faceCode: 'CC 2/8',
+        carbide: 'XT48',
+        carbideGrade: 'Standard',
+        gaugeButtons: 8,
+        faceButtons: 2,
+        buttonDia: 14,
+        airHoles: 2,
+        weight: 5.5,
+        efficiency: 0.84,
+        cost: 539.11,
+        lifeMetres: 800,
+        notes: 'Production/batter standard',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/dth-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460-4-QLX4', 'SVK-RH510R-4', 'SVK-RH560G-4']
+    },
+    {
+        id: 'SVK-5645-127-SH69',
+        supplier: 'sandvik',
+        partNumber: '42-4H18127-S69K',
+        name: '5645 127mm CC SH69 K',
+        shank: 'QLX40',
+        diameter: 127,
+        face: 'Concave',
+        faceCode: 'CC 2/8',
+        carbide: 'SH69',
+        carbideGrade: 'PowerCarbide',
+        gaugeButtons: 8,
+        faceButtons: 2,
+        buttonDia: 14,
+        airHoles: 2,
+        weight: 5.6,
+        efficiency: 0.90,
+        cost: 757.07,
+        lifeMetres: 1000,
+        notes: 'PowerCarbide +45% life',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/powercarbide-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460-4-QLX4', 'SVK-RH560G-4']
+    },
+    // SANDVIK QL60 BITS - 165mm
+    {
+        id: 'SVK-QL60-165-XT48',
+        supplier: 'sandvik',
+        partNumber: '42-76DE165-S48',
+        name: 'QL60 165mm CC XT48',
+        shank: 'QL60',
+        diameter: 165,
+        face: 'Concave',
+        faceCode: 'CC 3/9',
+        carbide: 'XT48',
+        carbideGrade: 'Standard',
+        gaugeButtons: 9,
+        faceButtons: 3,
+        buttonDia: 16,
+        airHoles: 3,
+        weight: 10.5,
+        efficiency: 0.85,
+        cost: 822.69,
+        lifeMetres: 550,
+        notes: 'Production standard 165mm',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/dth-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460G-6', 'SVK-RH510G-6', 'SVK-RH560G-6']
+    },
+    {
+        id: 'SVK-QL60-165-DP65',
+        supplier: 'sandvik',
+        partNumber: '42-76DE165-S65',
+        name: 'QL60 165mm CC DP65',
+        shank: 'QL60',
+        diameter: 165,
+        face: 'Concave',
+        faceCode: 'CC 3/9',
+        carbide: 'DP65',
+        carbideGrade: 'Dual Property',
+        gaugeButtons: 9,
+        faceButtons: 3,
+        buttonDia: 16,
+        airHoles: 3,
+        weight: 10.5,
+        efficiency: 0.87,
+        cost: 965.87,
+        lifeMetres: 650,
+        notes: 'Premium carbide 165mm',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/dth-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460G-6', 'SVK-RH510G-6', 'SVK-RH560G-6']
+    },
+    {
+        id: 'SVK-QL60-165-SH69-BD',
+        supplier: 'sandvik',
+        partNumber: '42-76ED165-S69K',
+        name: 'QL60 165mm BD SH69 K',
+        shank: 'QL60',
+        diameter: 165,
+        face: 'Ballistic Drop',
+        faceCode: 'BD 2/10',
+        carbide: 'SH69',
+        carbideGrade: 'PowerCarbide',
+        gaugeButtons: 10,
+        faceButtons: 2,
+        buttonDia: 16,
+        airHoles: 3,
+        weight: 10.8,
+        efficiency: 0.92,
+        cost: 1072.95,
+        lifeMetres: 850,
+        notes: 'PowerCarbide + Ballistic Drop',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/powercarbide-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460G-6', 'SVK-RH560G-6', 'SVK-RH560G-6-OP']
+    },
+    {
+        id: 'SVK-QL560-165-SH69',
+        supplier: 'sandvik',
+        partNumber: '42-63ED165-S69K',
+        name: 'QL560-6 165mm BD SH69',
+        shank: 'QL60',
+        diameter: 165,
+        face: 'Ballistic Drop',
+        faceCode: 'BD 2/10',
+        carbide: 'SH69',
+        carbideGrade: 'PowerCarbide',
+        gaugeButtons: 10,
+        faceButtons: 2,
+        buttonDia: 16,
+        airHoles: 3,
+        weight: 10.8,
+        efficiency: 0.93,
+        cost: 1058.25,
+        lifeMetres: 900,
+        notes: 'Premium RH560 bit - BEST VALUE',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/powercarbide-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH560G-6', 'SVK-RH560G-6-OP']
+    },
+    // SANDVIK QL80 BITS - MD6250
+    {
+        id: 'SVK-QL80-203-XT48',
+        supplier: 'sandvik',
+        partNumber: '42-83PE203-S48',
+        name: 'QL80 203mm CC XT48',
+        shank: 'QL80',
+        diameter: 203,
+        face: 'Concave',
+        faceCode: 'CC 3/9',
+        carbide: 'XT48',
+        carbideGrade: 'Standard',
+        gaugeButtons: 9,
+        faceButtons: 3,
+        buttonDia: 19,
+        airHoles: 4,
+        weight: 22,
+        efficiency: 0.85,
+        cost: 2027.75,
+        lifeMetres: 450,
+        notes: 'MD6250 Production 203mm',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/dth-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460-8', 'SVK-RH460G-8']
+    },
+    {
+        id: 'SVK-QL80-216-DP65',
+        supplier: 'sandvik',
+        partNumber: '42-83BE216-S65',
+        name: 'QL80 216mm BD DP65',
+        shank: 'QL80',
+        diameter: 216,
+        face: 'Ballistic Drop',
+        faceCode: 'BD 2/12',
+        carbide: 'DP65',
+        carbideGrade: 'Dual Property',
+        gaugeButtons: 12,
+        faceButtons: 2,
+        buttonDia: 19,
+        airHoles: 4,
+        weight: 25,
+        efficiency: 0.88,
+        cost: 2415.98,
+        lifeMetres: 600,
+        notes: 'MD6250 Production 216mm - RECOMMENDED',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/dth-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460-8', 'SVK-RH460G-8']
+    },
+    {
+        id: 'SVK-QL80-229-XT48',
+        supplier: 'sandvik',
+        partNumber: '42-838E229-S48',
+        name: 'QL80 229mm CC XT48',
+        shank: 'QL80',
+        diameter: 229,
+        face: 'Concave',
+        faceCode: 'CC 3/12',
+        carbide: 'XT48',
+        carbideGrade: 'Standard',
+        gaugeButtons: 12,
+        faceButtons: 3,
+        buttonDia: 19,
+        airHoles: 4,
+        weight: 28,
+        efficiency: 0.84,
+        cost: 2829.03,
+        lifeMetres: 400,
+        notes: 'MD6250 Standard 229mm',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/dth-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460-8', 'SVK-RH460G-8']
+    },
+    {
+        id: 'SVK-QL80-254-XT48',
+        supplier: 'sandvik',
+        partNumber: '42-838E254-S48',
+        name: 'QL80 254mm CC XT48',
+        shank: 'QL80',
+        diameter: 254,
+        face: 'Concave',
+        faceCode: 'CC 3/12',
+        carbide: 'XT48',
+        carbideGrade: 'Standard',
+        gaugeButtons: 12,
+        faceButtons: 3,
+        buttonDia: 22,
+        airHoles: 4,
+        weight: 35,
+        efficiency: 0.80,
+        cost: 3419.71,
+        lifeMetres: 350,
+        notes: 'MD6250 Collaring 254mm',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/dth-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460-8', 'SVK-RH460G-8']
+    },
+    {
+        id: 'SVK-QL80-270-XT48',
+        supplier: 'sandvik',
+        partNumber: '42-838E270-C48',
+        name: 'QL80 270mm C XT48',
+        shank: 'QL80',
+        diameter: 270,
+        face: 'Concave',
+        faceCode: 'CC 3/12',
+        carbide: 'XT48',
+        carbideGrade: 'Standard',
+        gaugeButtons: 12,
+        faceButtons: 3,
+        buttonDia: 22,
+        airHoles: 4,
+        weight: 40,
+        efficiency: 0.78,
+        cost: 3893.56,
+        lifeMetres: 350,
+        notes: 'MD6250 Collaring 270mm',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-bits/dth-bit.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/down-the-hole-bits/',
+        hammerCompatibility: ['SVK-RH460-8', 'SVK-RH460G-8']
+    },
+    
+    // EPIROC COP M-Series BITS
+    {
+        id: 'EPI-COPM-165-STD',
+        supplier: 'epiroc',
+        partNumber: 'COP64-165-CC',
+        name: 'COP 64 165mm CC',
+        shank: 'COP 64',
+        diameter: 165,
+        face: 'Concave',
+        faceCode: 'CC',
+        carbide: 'Enduro',
+        carbideGrade: 'Enduro Extra',
+        gaugeButtons: 10,
+        faceButtons: 3,
+        buttonDia: 16,
+        airHoles: 3,
+        weight: 10.2,
+        efficiency: 0.90,
+        cost: 1150.00,
+        lifeMetres: 750,
+        notes: 'Solid shank - no shank breaks',
+        imageUrl: 'https://www.epiroc.com/content/dam/epiroc/rock-drilling-tools/products/cop-m-series/cop-m-bit.png',
+        productUrl: 'https://www.epiroc.com/en-au/products/rock-drilling-tools/down-the-hole-drilling-tools/cop-m-series',
+        hammerCompatibility: ['EPI-COPM6']
+    },
+    {
+        id: 'EPI-COPM-203-BD',
+        supplier: 'epiroc',
+        partNumber: 'COP74-203-BD',
+        name: 'COP 74 203mm BD',
+        shank: 'COP 74',
+        diameter: 203,
+        face: 'Ballistic Drop',
+        faceCode: 'BD',
+        carbide: 'Enduro',
+        carbideGrade: 'Enduro Extra',
+        gaugeButtons: 12,
+        faceButtons: 3,
+        buttonDia: 19,
+        airHoles: 4,
+        weight: 21,
+        efficiency: 0.92,
+        cost: 2350.00,
+        lifeMetres: 550,
+        notes: 'COP M7 premium bit - 50% longer life',
+        imageUrl: 'https://www.epiroc.com/content/dam/epiroc/rock-drilling-tools/products/cop-m-series/cop-m-bit.png',
+        productUrl: 'https://www.epiroc.com/en-au/products/rock-drilling-tools/down-the-hole-drilling-tools/cop-m-series',
+        hammerCompatibility: ['EPI-COPM7']
+    },
+    {
+        id: 'EPI-COPM-229-CC',
+        supplier: 'epiroc',
+        partNumber: 'COP84-229-CC',
+        name: 'COP 84 229mm CC',
+        shank: 'COP 84',
+        diameter: 229,
+        face: 'Concave',
+        faceCode: 'CC',
+        carbide: 'Enduro',
+        carbideGrade: 'Enduro Extra',
+        gaugeButtons: 12,
+        faceButtons: 4,
+        buttonDia: 22,
+        airHoles: 4,
+        weight: 28,
+        efficiency: 0.88,
+        cost: 3100.00,
+        lifeMetres: 480,
+        notes: 'COP M8 production bit',
+        imageUrl: 'https://www.epiroc.com/content/dam/epiroc/rock-drilling-tools/products/cop-m-series/cop-m-bit.png',
+        productUrl: 'https://www.epiroc.com/en-au/products/rock-drilling-tools/down-the-hole-drilling-tools/cop-m-series',
+        hammerCompatibility: ['EPI-COPM8']
+    },
+    
+    // MINCON DTH BITS
+    {
+        id: 'MIN-QL60-165-CC',
+        supplier: 'mincon',
+        partNumber: 'MQ60-165CC',
+        name: 'MQ60 165mm CC',
+        shank: 'QL60',
+        diameter: 165,
+        face: 'Concave',
+        faceCode: 'CC',
+        carbide: 'Standard',
+        carbideGrade: 'Standard',
+        gaugeButtons: 9,
+        faceButtons: 3,
+        buttonDia: 16,
+        airHoles: 3,
+        weight: 10.3,
+        efficiency: 0.86,
+        cost: 850.00,
+        lifeMetres: 580,
+        notes: 'Production bit - tubeless design',
+        imageUrl: 'https://mincon.com/wp-content/uploads/2023/03/DTH-Bit.png',
+        productUrl: 'https://mincon.com/product/dth-drill-bits/',
+        hammerCompatibility: ['MIN-MP60']
+    },
+    {
+        id: 'MIN-QL80-216-BD',
+        supplier: 'mincon',
+        partNumber: 'MQ80-216BD',
+        name: 'MQ80 216mm BD',
+        shank: 'QL80',
+        diameter: 216,
+        face: 'Ballistic Drop',
+        faceCode: 'BD',
+        carbide: 'Premium',
+        carbideGrade: 'Premium',
+        gaugeButtons: 12,
+        faceButtons: 3,
+        buttonDia: 19,
+        airHoles: 4,
+        weight: 24,
+        efficiency: 0.88,
+        cost: 2200.00,
+        lifeMetres: 520,
+        notes: 'Heavy duty production',
+        imageUrl: 'https://mincon.com/wp-content/uploads/2023/03/DTH-Bit.png',
+        productUrl: 'https://mincon.com/product/dth-drill-bits/',
+        hammerCompatibility: ['MIN-MP80']
+    },
+    
+    // ROBIT DTH BITS
+    {
+        id: 'ROB-QL60-165-A',
+        supplier: 'robit',
+        partNumber: 'RB60-165A',
+        name: 'RB60 165mm Type A',
+        shank: 'QL60',
+        diameter: 165,
+        face: 'Convex',
+        faceCode: 'CX',
+        carbide: 'SuperDome',
+        carbideGrade: 'SuperDome',
+        gaugeButtons: 10,
+        faceButtons: 3,
+        buttonDia: 16,
+        airHoles: 3,
+        weight: 10.4,
+        efficiency: 0.87,
+        cost: 780.00,
+        lifeMetres: 600,
+        notes: 'Hard abrasive rock',
+        imageUrl: 'https://www.robitgroup.com/wp-content/uploads/2020/05/DTH-bit.png',
+        productUrl: 'https://www.robitgroup.com/products/dth-drilling/',
+        hammerCompatibility: ['ROB-H6']
+    },
+    {
+        id: 'ROB-QL80-203-S',
+        supplier: 'robit',
+        partNumber: 'RB80-203S',
+        name: 'RB80 203mm Type S',
+        shank: 'QL80',
+        diameter: 203,
+        face: 'Concave',
+        faceCode: 'CC',
+        carbide: 'SuperDome',
+        carbideGrade: 'SuperDome',
+        gaugeButtons: 9,
+        faceButtons: 3,
+        buttonDia: 19,
+        airHoles: 4,
+        weight: 21,
+        efficiency: 0.86,
+        cost: 1950.00,
+        lifeMetres: 480,
+        notes: 'Production drilling',
+        imageUrl: 'https://www.robitgroup.com/wp-content/uploads/2020/05/DTH-bit.png',
+        productUrl: 'https://www.robitgroup.com/products/dth-drilling/',
+        hammerCompatibility: ['ROB-H8']
+    }
+];
+
+// ============================================
+// DRILL PIPES DATABASE
+// ============================================
+const PIPES_DB = [
+    // SANDVIK D65 PIPES
+    {
+        id: 'SVK-PIPE-89',
+        supplier: 'sandvik',
+        partNumber: 'DP-89-6000',
+        name: '89mm (3.5") Drill Pipe',
+        od: 89,
+        odInch: 3.5,
+        id: 57,
+        wallThickness: 16,
+        length: 6000,
+        topThread: 'API 2-3/8" Reg Pin',
+        bottomThread: 'API 2-3/8" Reg Box',
+        weight: 42,
+        cost: 1281.52,
+        lifeMetres: 30000,
+        notes: 'D65 Wall control pipe',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-pipes/drill-pipe.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/drill-pipes/',
+        rigCompatibility: ['D65']
+    },
+    {
+        id: 'SVK-PIPE-102',
+        supplier: 'sandvik',
+        partNumber: 'DP-102-6000',
+        name: '102mm (4") Drill Pipe',
+        od: 102,
+        odInch: 4.0,
+        id: 70,
+        wallThickness: 16,
+        length: 6000,
+        topThread: 'API 2-3/8" Reg Pin',
+        bottomThread: 'API 2-3/8" Reg Box',
+        weight: 52,
+        cost: 1236.93,
+        lifeMetres: 25000,
+        notes: 'D65 Standard production pipe',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-pipes/drill-pipe.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/drill-pipes/',
+        rigCompatibility: ['D65']
+    },
+    {
+        id: 'SVK-PIPE-114',
+        supplier: 'sandvik',
+        partNumber: 'DP-114-6000',
+        name: '114mm (4.5") Drill Pipe',
+        od: 114,
+        odInch: 4.5,
+        id: 82,
+        wallThickness: 16,
+        length: 6000,
+        topThread: 'API 3-1/2" Reg Pin',
+        bottomThread: 'API 3-1/2" Reg Box',
+        weight: 62,
+        cost: 1400.00,
+        lifeMetres: 25000,
+        notes: 'D65 Heavy duty pipe',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-pipes/drill-pipe.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/drill-pipes/',
+        rigCompatibility: ['D65']
+    },
+    // MD6250 PIPES
+    {
+        id: 'SVK-PIPE-140',
+        supplier: 'sandvik',
+        partNumber: 'DP-140-6100',
+        name: '140mm (5.5") Drill Pipe',
+        od: 140,
+        odInch: 5.5,
+        id: 102,
+        wallThickness: 19,
+        length: 6100,
+        topThread: 'API 4-1/2" Reg Pin',
+        bottomThread: 'API 4-1/2" Reg Box',
+        weight: 95,
+        cost: 7740.00,
+        lifeMetres: 25000,
+        notes: 'MD6250 Standard pipe',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-pipes/drill-pipe.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/drill-pipes/',
+        rigCompatibility: ['MD6250', 'MD6310']
+    },
+    {
+        id: 'SVK-PIPE-168',
+        supplier: 'sandvik',
+        partNumber: 'DP-168-6100',
+        name: '168mm (6.6") Drill Pipe',
+        od: 168,
+        odInch: 6.6,
+        id: 127,
+        wallThickness: 20.5,
+        length: 6100,
+        topThread: 'API 4-1/2" Reg Pin',
+        bottomThread: 'API 4-1/2" Reg Box',
+        weight: 125,
+        cost: 8500.00,
+        lifeMetres: 25000,
+        notes: 'MD6250 Large diameter pipe',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-pipes/drill-pipe.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/drill-pipes/',
+        rigCompatibility: ['MD6250', 'MD6310']
+    },
+    {
+        id: 'SVK-PIPE-178',
+        supplier: 'sandvik',
+        partNumber: 'DP-178-6100',
+        name: '178mm (7") Drill Pipe',
+        od: 178,
+        odInch: 7.0,
+        id: 133,
+        wallThickness: 22.5,
+        length: 6100,
+        topThread: 'API 4-1/2" Reg Pin',
+        bottomThread: 'API 4-1/2" Reg Box',
+        weight: 145,
+        cost: 9200.00,
+        lifeMetres: 25000,
+        notes: 'MD6250 Heavy duty pipe',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/dth-pipes/drill-pipe.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/drill-pipes/',
+        rigCompatibility: ['MD6250', 'MD6310']
+    }
+];
+
+// ============================================
+// DRILL STRING COMPONENTS DATABASE
+// ============================================
+const DRILL_STRING_DB = [
+    {
+        id: 'SVK-DECK-INNER',
+        supplier: 'sandvik',
+        partNumber: 'DB07000900SL030',
+        name: 'Deck Bush (Inner)',
+        type: 'Deck Bush',
+        od: 175,
+        id: 145,
+        length: 150,
+        weight: 8.5,
+        cost: 1448.75,
+        lifeMetres: 10000,
+        notes: 'MD6250 inner deck bush',
+        imageUrl: '',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/',
+        rigCompatibility: ['MD6250']
+    },
+    {
+        id: 'SVK-DECK-OUTER',
+        supplier: 'sandvik',
+        partNumber: 'DB01001100SL031',
+        name: 'Deck Bush (Outer)',
+        type: 'Deck Bush',
+        od: 220,
+        id: 175,
+        length: 180,
+        weight: 12,
+        cost: 1828.75,
+        lifeMetres: 20000,
+        notes: 'MD6250 outer deck bush',
+        imageUrl: '',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/',
+        rigCompatibility: ['MD6250']
+    },
+    {
+        id: 'SVK-SUB-BECO',
+        supplier: 'sandvik',
+        partNumber: 'AD07006151L5069',
+        name: 'Sub 4-1/2" BECO',
+        type: 'Sub Adapter',
+        topThread: 'API 4-1/2" Reg Box',
+        bottomThread: 'BECO',
+        length: 320,
+        weight: 25,
+        cost: 4712.95,
+        lifeMetres: 12500,
+        notes: 'MD6250 BECO adapter sub',
+        imageUrl: '',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/',
+        rigCompatibility: ['MD6250']
+    },
+    {
+        id: 'SVK-SAVER-SUB',
+        supplier: 'sandvik',
+        partNumber: 'AD07001111L5068',
+        name: 'Saver Sub',
+        type: 'Saver Sub',
+        topThread: 'API 4-1/2" Reg Pin',
+        bottomThread: 'API 4-1/2" Reg Box',
+        length: 250,
+        weight: 18,
+        cost: 1860.10,
+        lifeMetres: 12500,
+        notes: 'Thread protection saver sub',
+        imageUrl: '',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/',
+        rigCompatibility: ['MD6250', 'D65']
+    },
+    {
+        id: 'SVK-SHOCK-D65',
+        supplier: 'sandvik',
+        partNumber: 'RP550-D65',
+        name: 'RP550 Shock Absorber D65',
+        type: 'Shock Absorber',
+        topThread: 'API 3-1/2" Reg Pin',
+        bottomThread: 'API 3-1/2" Reg Box',
+        length: 850,
+        weight: 45,
+        cost: 15000.00,
+        lifeMetres: 50000,
+        notes: 'D65 shock absorber - +7% pen rate',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/shock-absorber.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/shock-absorbers/',
+        rigCompatibility: ['D65']
+    },
+    {
+        id: 'SVK-SHOCK-MD6250',
+        supplier: 'sandvik',
+        partNumber: 'RP550-MD6250',
+        name: 'RP550 Shock Absorber MD6250',
+        type: 'Shock Absorber',
+        topThread: 'API 4-1/2" Reg Pin',
+        bottomThread: 'API 4-1/2" Reg Box',
+        length: 1100,
+        weight: 85,
+        cost: 40000.00,
+        lifeMetres: 75000,
+        notes: 'MD6250 shock absorber - +7% pen rate',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/rock-tools/down-the-hole-drilling-tools/shock-absorber.png',
+        productUrl: 'https://www.mining.sandvik/en/products/rock-tools/down-the-hole-drilling-tools/shock-absorbers/',
+        rigCompatibility: ['MD6250']
+    }
+];
+
+// ============================================
+// CARBIDE GRADES REFERENCE
+// ============================================
+const CARBIDE_GRADES = {
+    'XT48': { name: 'XT48', manufacturer: 'Sandvik', type: 'Standard', lifeBonus: 1.0, description: 'Standard grade for most conditions' },
+    'XT49': { name: 'XT49', manufacturer: 'Sandvik', type: 'Enhanced', lifeBonus: 1.15, description: 'Reduced early breakages' },
+    'DP65': { name: 'DP65', manufacturer: 'Sandvik', type: 'Dual Property', lifeBonus: 1.25, description: 'Patented dual property grade' },
+    'SH69': { name: 'SH69', manufacturer: 'Sandvik', type: 'PowerCarbide', lifeBonus: 1.45, description: 'PowerCarbide - +45% life' },
+    'SH70': { name: 'SH70', manufacturer: 'Sandvik', type: 'PowerCarbide', lifeBonus: 1.50, description: 'Self-hardening PowerCarbide' },
+    'GC81': { name: 'GC81', manufacturer: 'Sandvik', type: 'Premium', lifeBonus: 1.35, description: 'Hard & abrasive conditions' },
+    'Enduro': { name: 'Enduro Extra', manufacturer: 'Epiroc', type: 'Premium', lifeBonus: 1.20, description: '+20% regrind intervals' },
+    'SuperDome': { name: 'SuperDome', manufacturer: 'Robit', type: 'Premium', lifeBonus: 1.15, description: 'Hard rock specialist' }
+};
+
+// ============================================
+// RIG REFERENCE DATA
+// ============================================
+const RIGS_DB = {
+    'D65': { 
+        name: 'Epiroc SmartROC D65', 
+        manufacturer: 'Epiroc',
+        compressorCFM: 995, 
+        maxPressureBar: 30, 
+        holeSizes: [105, 115, 127, 140, 152, 165, 178, 190],
+        pipeOD: [89, 102, 114, 127],
+        topSub: 'API 3-1/2" Reg',
+        imageUrl: 'https://www.epiroc.com/content/dam/epiroc/surface-drill-rigs/smartroc-d65.png'
+    },
+    'FlexiROC D60': { 
+        name: 'Epiroc FlexiROC D60', 
+        manufacturer: 'Epiroc',
+        compressorCFM: 850, 
+        maxPressureBar: 28, 
+        holeSizes: [89, 102, 115, 127, 140, 152],
+        pipeOD: [76, 89, 102],
+        topSub: 'API 2-3/8" Reg',
+        imageUrl: 'https://www.epiroc.com/content/dam/epiroc/surface-drill-rigs/flexiroc-d60.png'
+    },
+    'MD6250': { 
+        name: 'Caterpillar MD6250', 
+        manufacturer: 'Caterpillar',
+        compressorCFM: 1350, 
+        maxPressureBar: 34.4, 
+        holeSizes: [200, 203, 216, 229, 251, 254, 270, 311],
+        pipeOD: [140, 168, 178],
+        topSub: 'API 4-1/2" Reg',
+        imageUrl: ''
+    },
+    'PV271': { 
+        name: 'Sandvik PV271', 
+        manufacturer: 'Sandvik',
+        compressorCFM: 1200, 
+        maxPressureBar: 35, 
+        holeSizes: [200, 229, 251, 270, 311],
+        pipeOD: [140, 168],
+        topSub: 'API 4-1/2" Reg',
+        imageUrl: 'https://www.mining.sandvik/globalassets/products/surface-drill-rigs/pv271.png'
+    }
+};
+
+// ============================================
+// DATABASE HELPER FUNCTIONS
+// ============================================
+
+// Get user-added items from localStorage
+function getUserItems() {
+    const stored = localStorage.getItem('dth_user_items');
+    return stored ? JSON.parse(stored) : { hammers: [], bits: [], pipes: [], drillString: [] };
+}
+
+// Save user item
+function saveUserItem(type, item) {
+    const userItems = getUserItems();
+    item.id = 'USER-' + Date.now();
+    item.supplier = 'custom';
+    userItems[type].push(item);
+    localStorage.setItem('dth_user_items', JSON.stringify(userItems));
+    return item.id;
+}
+
+// Delete user item
+function deleteUserItem(type, itemId) {
+    const userItems = getUserItems();
+    userItems[type] = userItems[type].filter(i => i.id !== itemId);
+    localStorage.setItem('dth_user_items', JSON.stringify(userItems));
+}
+
+// Get all hammers (DB + user)
+function getAllHammers() {
+    const userItems = getUserItems();
+    return [...HAMMERS_DB, ...userItems.hammers];
+}
+
+// Get all bits (DB + user)
+function getAllBits() {
+    const userItems = getUserItems();
+    return [...BITS_DB, ...userItems.bits];
+}
+
+// Get all pipes (DB + user)
+function getAllPipes() {
+    const userItems = getUserItems();
+    return [...PIPES_DB, ...userItems.pipes];
+}
+
+// Get all drill string components (DB + user)
+function getAllDrillString() {
+    const userItems = getUserItems();
+    return [...DRILL_STRING_DB, ...userItems.drillString];
+}
+
+// Filter functions
+function filterBySupplier(items, supplier) {
+    if (!supplier || supplier === 'all') return items;
+    return items.filter(i => i.supplier === supplier);
+}
+
+function filterBySize(hammers, size) {
+    if (!size) return hammers;
+    return hammers.filter(h => h.size === parseFloat(size));
+}
+
+function filterByDiameter(bits, diameter) {
+    if (!diameter) return bits;
+    return bits.filter(b => b.diameter === parseInt(diameter));
+}
+
+function filterByShank(items, shank) {
+    if (!shank || shank === 'all') return items;
+    return items.filter(i => i.shank === shank);
+}
+
+function filterByRig(items, rig) {
+    if (!rig || rig === 'all') return items;
+    return items.filter(i => i.rigCompatibility && i.rigCompatibility.includes(rig));
+}
+
+// Search function
+function searchItems(items, query) {
+    if (!query) return items;
+    const q = query.toLowerCase();
+    return items.filter(i => 
+        (i.name && i.name.toLowerCase().includes(q)) ||
+        (i.partNumber && i.partNumber.toLowerCase().includes(q)) ||
+        (i.series && i.series.toLowerCase().includes(q)) ||
+        (i.notes && i.notes.toLowerCase().includes(q))
+    );
+}
+
+// Export for use in application
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        SUPPLIERS, HAMMERS_DB, BITS_DB, PIPES_DB, DRILL_STRING_DB,
+        CARBIDE_GRADES, RIGS_DB,
+        getUserItems, saveUserItem, deleteUserItem,
+        getAllHammers, getAllBits, getAllPipes, getAllDrillString,
+        filterBySupplier, filterBySize, filterByDiameter, filterByShank, filterByRig,
+        searchItems
+    };
+}

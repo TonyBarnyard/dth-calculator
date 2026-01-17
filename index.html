@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTH Drill String Calculator - Multi-Supplier Database</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f172a; color: white; font-family: system-ui, sans-serif; }
+        select, input { background: #1e293b; border: 1px solid #334155; color: white; }
+        .card { background: #1e293b; border: 1px solid #334155; }
+        .highlight { background: linear-gradient(135deg, #1e3a5f 0%, #172554 100%); border: 1px solid #f59e0b; }
+        .gauge-ring { transition: stroke-dasharray 0.5s ease; }
+        .supplier-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+        .supplier-sandvik { background: #dc2626; }
+        .supplier-epiroc { background: #2563eb; }
+        .supplier-mincon { background: #16a34a; }
+        .supplier-robit { background: #7c3aed; }
+        .supplier-numa { background: #ea580c; }
+        .supplier-custom { background: #6b7280; }
+        .product-card { transition: all 0.2s ease; cursor: pointer; }
+        .product-card:hover { transform: translateY(-2px); border-color: #f59e0b; }
+        .product-card.selected { border-color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+        .tab-btn.active { background: #f59e0b; color: black; }
+        .modal-overlay { background: rgba(0,0,0,0.8); }
+        
+        /* Print Styles */
+        @media print {
+            @page { size: A4 portrait; margin: 10mm; }
+            body { background: white !important; color: black !important; font-size: 9pt; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .print-page { background: white; color: black; }
+            .print-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 5mm; }
+            .print-table th, .print-table td { border: 1px solid #333; padding: 2mm; }
+            .print-table th { background: #e5e5e5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .print-header { border-bottom: 2px solid black; padding-bottom: 5mm; margin-bottom: 5mm; }
+            .print-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; margin: 5mm 0; }
+            .print-metric-box { border: 2px solid #333; padding: 3mm; text-align: center; }
+            .print-metric-value { font-size: 16pt; font-weight: bold; }
+        }
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Product Browser Modal -->
+    <div id="browserModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-slate-600 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-orange-400">📦 DTH Consumables Database</h2>
+                    <p class="text-sm text-gray-400">Select from database or add custom items</p>
+                </div>
+                <button onclick="closeBrowser()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-600">
+                <button class="tab-btn active px-4 py-2 font-semibold" onclick="switchTab('hammers')">🔨 Hammers</button>
+                <button class="tab-btn px-4 py-2 font-semibold" onclick="switchTab('bits')">💎 Bits</button>
+                <button class="tab-btn px-4 py-2 font-semibold" onclick="switchTab('pipes')">🔧 Pipes</button>
+                <button class="tab-btn px-4 py-2 font-semibold" onclick="switchTab('drillstring')">⚙️ Drill String</button>
+                <button class="tab-btn px-4 py-2 font-semibold" onclick="switchTab('addnew')">➕ Add New</button>
+            </div>
+            
+            <!-- Filters -->
+            <div class="p-3 bg-slate-700 flex flex-wrap gap-3 items-center">
+                <div>
+                    <label class="text-xs text-gray-400">Search</label>
+                    <input type="text" id="browserSearch" class="rounded px-2 py-1 text-sm w-40" placeholder="Part # or name..." oninput="filterBrowser()">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">Supplier</label>
+                    <select id="browserSupplier" class="rounded px-2 py-1 text-sm" onchange="filterBrowser()">
+                        <option value="all">All Suppliers</option>
+                        <option value="sandvik">Sandvik</option>
+                        <option value="epiroc">Epiroc</option>
+                        <option value="mincon">Mincon</option>
+                        <option value="robit">Robit</option>
+                        <option value="numa">Numa</option>
+                        <option value="custom">My Custom Items</option>
+                    </select>
+                </div>
+                <div id="sizeFilter">
+                    <label class="text-xs text-gray-400">Size</label>
+                    <select id="browserSize" class="rounded px-2 py-1 text-sm" onchange="filterBrowser()">
+                        <option value="">All Sizes</option>
+                    </select>
+                </div>
+                <div id="rigFilter">
+                    <label class="text-xs text-gray-400">Rig</label>
+                    <select id="browserRig" class="rounded px-2 py-1 text-sm" onchange="filterBrowser()">
+                        <option value="all">All Rigs</option>
+                        <option value="D65">SmartROC D65</option>
+                        <option value="MD6250">Cat MD6250</option>
+                        <option value="FlexiROC D60">FlexiROC D60</option>
+                        <option value="PV271">Sandvik PV271</option>
+                    </select>
+                </div>
+                <div class="flex-grow"></div>
+                <span id="itemCount" class="text-sm text-gray-400">0 items</span>
+            </div>
+            
+            <!-- Product Grid -->
+            <div id="browserContent" class="flex-grow overflow-y-auto p-4">
+                <!-- Products loaded here -->
+            </div>
+            
+            <!-- Add New Item Form (hidden by default) -->
+            <div id="addNewForm" class="hidden p-4 overflow-y-auto">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="font-semibold text-orange-400 mb-3">Add Custom Item</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs text-gray-400">Item Type</label>
+                                <select id="newItemType" class="w-full rounded px-2 py-1 text-sm">
+                                    <option value="hammers">Hammer</option>
+                                    <option value="bits">Bit</option>
+                                    <option value="pipes">Pipe</option>
+                                    <option value="drillString">Drill String Component</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">Part Number *</label>
+                                <input type="text" id="newPartNumber" class="w-full rounded px-2 py-1 text-sm" required>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">Name/Description *</label>
+                                <input type="text" id="newName" class="w-full rounded px-2 py-1 text-sm" required>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-xs text-gray-400">Size (inches)</label>
+                                    <input type="number" id="newSize" class="w-full rounded px-2 py-1 text-sm" step="0.5">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400">Diameter (mm)</label>
+                                    <input type="number" id="newDiameter" class="w-full rounded px-2 py-1 text-sm">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-xs text-gray-400">Cost ($) *</label>
+                                    <input type="number" id="newCost" class="w-full rounded px-2 py-1 text-sm" step="0.01" required>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400">Est. Life (metres) *</label>
+                                    <input type="number" id="newLife" class="w-full rounded px-2 py-1 text-sm" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-blue-400 mb-3">Additional Details</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs text-gray-400">Series/Model</label>
+                                <input type="text" id="newSeries" class="w-full rounded px-2 py-1 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">Shank Type</label>
+                                <input type="text" id="newShank" class="w-full rounded px-2 py-1 text-sm" placeholder="e.g. QL60, API 3-1/2">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">Air Consumption (CFM) - Hammers</label>
+                                <input type="number" id="newAir" class="w-full rounded px-2 py-1 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">Carbide Grade - Bits</label>
+                                <input type="text" id="newCarbide" class="w-full rounded px-2 py-1 text-sm" placeholder="e.g. XT48, SH69">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">Notes</label>
+                                <textarea id="newNotes" class="w-full rounded px-2 py-1 text-sm h-16"></textarea>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400">Image URL (optional)</label>
+                                <input type="text" id="newImageUrl" class="w-full rounded px-2 py-1 text-sm" placeholder="https://...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end gap-3">
+                    <button onclick="switchTab('hammers')" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded font-semibold">Cancel</button>
+                    <button onclick="saveNewItem()" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded font-semibold">💾 Save Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logo Modal -->
+    <div id="logoModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-xl max-w-md w-full p-6">
+            <h2 class="text-xl font-bold text-orange-400 mb-4">🏢 Company Logo</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm text-gray-400">Logo Image URL</label>
+                    <input type="text" id="logoUrl" class="w-full rounded px-3 py-2 text-sm" placeholder="https://...">
+                </div>
+                <div id="logoPreview" class="bg-white p-4 rounded text-center hidden">
+                    <img id="logoPreviewImg" src="" alt="Preview" class="max-h-16 mx-auto">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button onclick="removeLogo()" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm font-semibold">Remove</button>
+                <button onclick="saveLogo()" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-semibold">Save</button>
+                <button onclick="closeLogoModal()" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-sm font-semibold">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Page -->
+    <div id="printPage" class="print-only print-page p-8">
+        <div class="print-header flex justify-between items-start">
+            <div id="printLogoArea"><img id="printLogo" src="" alt="" style="max-height: 50px; display: none;"></div>
+            <div class="text-right">
+                <h1 class="text-2xl font-bold" id="printTitle">DTH DRILL STRING EVALUATION</h1>
+                <p id="printSubtitle" class="text-gray-600"></p>
+            </div>
+        </div>
+        
+        <div class="print-metrics">
+            <div class="print-metric-box"><div class="print-metric-value" id="pEfficiency">0%</div><div class="text-xs">EFFICIENCY</div></div>
+            <div class="print-metric-box"><div class="print-metric-value" id="pBailing">0 fpm</div><div class="text-xs">BAILING VELOCITY</div></div>
+            <div class="print-metric-box"><div class="print-metric-value" id="pCost">$0.00</div><div class="text-xs">COST/METRE</div></div>
+        </div>
+        
+        <table class="print-table">
+            <thead>
+                <tr><th>Component</th><th>Supplier</th><th>Part Number</th><th>Cost</th><th>Life</th><th>$/m</th></tr>
+            </thead>
+            <tbody id="printComponents"></tbody>
+        </table>
+        
+        <div class="mt-4 text-xs">
+            <strong>Generated:</strong> <span id="printDate"></span> | 
+            <strong>Rig:</strong> <span id="printRig"></span> | 
+            <strong>Hole Diameter:</strong> <span id="printHoleDia"></span>
+        </div>
+    </div>
+
+    <!-- Main App Header -->
+    <div class="bg-gradient-to-r from-orange-500 to-amber-600 p-4 mb-4 no-print">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div id="headerLogoArea" class="hidden bg-white/20 rounded p-2">
+                    <img id="headerLogo" src="" alt="Logo" class="h-10 max-w-[120px] object-contain">
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-black">DTH Drill String Calculator</h1>
+                    <p class="text-black/70 text-sm">Multi-Supplier Database • Sandvik • Epiroc • Mincon • Robit</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openLogoModal()" class="px-3 py-1 bg-black/20 hover:bg-black/30 rounded text-sm text-black font-medium">🏢 Logo</button>
+                <button onclick="openBrowser('hammers')" class="px-3 py-1 bg-black/20 hover:bg-black/30 rounded text-sm text-black font-medium">📦 Database</button>
+                <button onclick="window.print()" class="px-3 py-1 bg-black/20 hover:bg-black/30 rounded text-sm text-black font-medium">🖨️ Print</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 pb-8 no-print">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Configuration Panel -->
+            <div class="lg:col-span-2 space-y-4">
+                <!-- Rig Selection -->
+                <div class="card rounded-lg p-4">
+                    <h2 class="text-lg font-semibold mb-3 text-blue-400">🏗️ Rig Configuration</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-gray-400">Drill Rig</label>
+                            <select id="rigSelect" class="w-full rounded px-3 py-2 text-sm" onchange="updateRigConfig()">
+                                <option value="D65">Epiroc SmartROC D65 (995 CFM)</option>
+                                <option value="MD6250">Cat MD6250 (1350 CFM)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-400">Hole Diameter (mm)</label>
+                            <select id="holeDiameter" class="w-full rounded px-3 py-2 text-sm" onchange="updateCalculation()"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Hammer -->
+                <div class="highlight rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-semibold text-orange-400">🔨 Hammer</h2>
+                        <button onclick="openBrowser('hammers')" class="px-3 py-1 bg-orange-600 hover:bg-orange-700 rounded text-xs font-semibold">Browse Database</button>
+                    </div>
+                    <div id="selectedHammer" class="bg-slate-800 rounded p-3">
+                        <p class="text-gray-400 text-sm">No hammer selected - click "Browse Database" to select</p>
+                    </div>
+                </div>
+
+                <!-- Selected Bit -->
+                <div class="highlight rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-semibold text-orange-400">💎 Bit</h2>
+                        <button onclick="openBrowser('bits')" class="px-3 py-1 bg-orange-600 hover:bg-orange-700 rounded text-xs font-semibold">Browse Database</button>
+                    </div>
+                    <div id="selectedBit" class="bg-slate-800 rounded p-3">
+                        <p class="text-gray-400 text-sm">No bit selected - click "Browse Database" to select</p>
+                    </div>
+                </div>
+
+                <!-- Selected Pipe -->
+                <div class="card rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-semibold text-purple-400">🔧 Drill Pipe</h2>
+                        <button onclick="openBrowser('pipes')" class="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs font-semibold">Browse Database</button>
+                    </div>
+                    <div id="selectedPipe" class="bg-slate-800 rounded p-3">
+                        <p class="text-gray-400 text-sm">No pipe selected - click "Browse Database" to select</p>
+                    </div>
+                </div>
+
+                <!-- Shock Sub Toggle -->
+                <div class="card rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-semibold text-green-400">🛡️ Shock Sub</h2>
+                            <p class="text-xs text-gray-400">+5-10% penetration rate</p>
+                        </div>
+                        <button id="shockToggle" class="px-4 py-2 bg-gray-600 rounded-lg font-semibold text-sm" onclick="toggleShockSub()">DISABLED</button>
+                    </div>
+                    <div id="shockInfo" class="mt-2 hidden grid grid-cols-3 gap-2 text-xs">
+                        <div class="bg-slate-800 p-2 rounded"><span class="text-gray-400">Cost:</span><br><span id="shockCost" class="text-green-400">$0</span></div>
+                        <div class="bg-slate-800 p-2 rounded"><span class="text-gray-400">Life:</span><br><span id="shockLife">0m</span></div>
+                        <div class="bg-slate-800 p-2 rounded"><span class="text-gray-400">$/m:</span><br><span id="shockCPM" class="text-orange-400">$0</span></div>
+                    </div>
+                </div>
+
+                <!-- Operating Pressure -->
+                <div class="card rounded-lg p-4">
+                    <h2 class="text-lg font-semibold mb-3 text-red-400">⚡ Operating Pressure</h2>
+                    <input type="range" id="pressureSlider" min="20" max="35" step="0.5" value="30" class="w-full" oninput="updateCalculation()">
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>20 bar</span>
+                        <span id="pressureValue" class="text-white font-bold">30 bar</span>
+                        <span id="maxPressure">35 bar</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="space-y-4">
+                <!-- Efficiency Gauge -->
+                <div class="card rounded-lg p-4 text-center">
+                    <h2 class="text-lg font-semibold mb-3">Configuration Efficiency</h2>
+                    <div class="relative w-36 h-36 mx-auto mb-3">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#334155" stroke-width="10"/>
+                            <circle id="gaugeRing" class="gauge-ring" cx="50" cy="50" r="45" fill="none" stroke="#16a34a" stroke-width="10" stroke-dasharray="0 283" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div><div id="effValue" class="text-3xl font-bold">0%</div><div class="text-xs text-gray-400">efficiency</div></div>
+                        </div>
+                    </div>
+                    <div id="effStatus" class="text-sm"></div>
+                </div>
+
+                <!-- Bailing Velocity -->
+                <div class="card rounded-lg p-4">
+                    <h3 class="text-sm font-semibold mb-2 text-gray-400">Bailing Velocity</h3>
+                    <div id="bvValue" class="text-2xl font-bold text-green-500">0 fpm</div>
+                    <div id="bvStatus" class="text-xs mt-1"></div>
+                    <div class="mt-2 bg-slate-700 rounded h-3"><div id="bvBar" class="h-3 rounded bg-green-500 transition-all" style="width: 0%"></div></div>
+                </div>
+
+                <!-- Cost Analysis -->
+                <div class="card rounded-lg p-4">
+                    <h3 class="text-sm font-semibold mb-2 text-orange-400">💰 Cost Analysis</h3>
+                    <div id="costAnalysis" class="space-y-1 text-sm"></div>
+                </div>
+
+                <!-- Total Cost -->
+                <div class="card rounded-lg p-4" style="background: linear-gradient(135deg, #065f46 0%, #064e3b 100%); border-color: #10b981;">
+                    <h3 class="text-lg font-semibold mb-2 text-green-300">📊 Total Cost per Metre</h3>
+                    <div id="totalCost" class="text-3xl font-bold text-white">$0.00</div>
+                    <div id="costBreakdown" class="text-xs text-green-200 mt-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="database.js"></script>
+    <script>
+        // ============================================
+        // APP STATE
+        // ============================================
+        let currentRig = 'D65';
+        let selectedHammer = null;
+        let selectedBit = null;
+        let selectedPipe = null;
+        let shockSubEnabled = false;
+        let companyLogo = localStorage.getItem('dth_company_logo') || '';
+        let currentBrowserTab = 'hammers';
+
+        const RIGS = {
+            'D65': { name: 'Epiroc SmartROC D65', cfm: 995, maxBar: 30, holeSizes: [105, 115, 127, 140, 152, 165, 178, 190], shock: { cost: 15000, life: 50000 } },
+            'MD6250': { name: 'Cat MD6250', cfm: 1350, maxBar: 34.4, holeSizes: [200, 203, 216, 229, 251, 254, 270], shock: { cost: 40000, life: 75000 } }
+        };
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLogo();
+            updateRigConfig();
+        });
+
+        function loadLogo() {
+            if (companyLogo) {
+                document.getElementById('headerLogo').src = companyLogo;
+                document.getElementById('headerLogoArea').classList.remove('hidden');
+                document.getElementById('printLogo').src = companyLogo;
+                document.getElementById('printLogo').style.display = 'block';
+            }
+        }
+
+        // ============================================
+        // RIG CONFIGURATION
+        // ============================================
+        function updateRigConfig() {
+            currentRig = document.getElementById('rigSelect').value;
+            const rig = RIGS[currentRig];
+            
+            document.getElementById('maxPressure').textContent = `${rig.maxBar} bar`;
+            document.getElementById('shockCost').textContent = `$${rig.shock.cost.toLocaleString()}`;
+            document.getElementById('shockLife').textContent = `${rig.shock.life.toLocaleString()}m`;
+            document.getElementById('shockCPM').textContent = `$${(rig.shock.cost / rig.shock.life).toFixed(2)}`;
+            
+            const holeSel = document.getElementById('holeDiameter');
+            holeSel.innerHTML = '';
+            rig.holeSizes.forEach(size => {
+                const opt = document.createElement('option');
+                opt.value = size;
+                opt.textContent = `${size}mm`;
+                holeSel.appendChild(opt);
+            });
+            
+            // Clear selections when rig changes
+            selectedHammer = null;
+            selectedBit = null;
+            selectedPipe = null;
+            document.getElementById('selectedHammer').innerHTML = '<p class="text-gray-400 text-sm">No hammer selected</p>';
+            document.getElementById('selectedBit').innerHTML = '<p class="text-gray-400 text-sm">No bit selected</p>';
+            document.getElementById('selectedPipe').innerHTML = '<p class="text-gray-400 text-sm">No pipe selected</p>';
+            
+            updateCalculation();
+        }
+
+        // ============================================
+        // BROWSER MODAL
+        // ============================================
+        function openBrowser(tab) {
+            document.getElementById('browserModal').classList.remove('hidden');
+            switchTab(tab);
+        }
+
+        function closeBrowser() {
+            document.getElementById('browserModal').classList.add('hidden');
+        }
+
+        function switchTab(tab) {
+            currentBrowserTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tab-btn:nth-child(${['hammers','bits','pipes','drillstring','addnew'].indexOf(tab) + 1})`).classList.add('active');
+            
+            if (tab === 'addnew') {
+                document.getElementById('browserContent').classList.add('hidden');
+                document.getElementById('addNewForm').classList.remove('hidden');
+                document.querySelector('.p-3.bg-slate-700').classList.add('hidden');
+            } else {
+                document.getElementById('browserContent').classList.remove('hidden');
+                document.getElementById('addNewForm').classList.add('hidden');
+                document.querySelector('.p-3.bg-slate-700').classList.remove('hidden');
+                updateSizeFilter(tab);
+                filterBrowser();
+            }
+        }
+
+        function updateSizeFilter(tab) {
+            const sizeSelect = document.getElementById('browserSize');
+            sizeSelect.innerHTML = '<option value="">All Sizes</option>';
+            
+            if (tab === 'hammers') {
+                [3, 4, 5, 6, 6.5, 7, 8, 10, 12].forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s;
+                    opt.textContent = `${s}"`;
+                    sizeSelect.appendChild(opt);
+                });
+            } else if (tab === 'bits') {
+                [105, 115, 127, 140, 152, 165, 178, 190, 203, 216, 229, 254, 270].forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = `${d}mm`;
+                    sizeSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function filterBrowser() {
+            const search = document.getElementById('browserSearch').value;
+            const supplier = document.getElementById('browserSupplier').value;
+            const size = document.getElementById('browserSize').value;
+            const rig = document.getElementById('browserRig').value;
+            
+            let items = [];
+            if (currentBrowserTab === 'hammers') items = getAllHammers();
+            else if (currentBrowserTab === 'bits') items = getAllBits();
+            else if (currentBrowserTab === 'pipes') items = getAllPipes();
+            else if (currentBrowserTab === 'drillstring') items = getAllDrillString();
+            
+            // Apply filters
+            items = filterBySupplier(items, supplier);
+            if (currentBrowserTab === 'hammers' && size) items = filterBySize(items, size);
+            if (currentBrowserTab === 'bits' && size) items = filterByDiameter(items, size);
+            items = filterByRig(items, rig);
+            items = searchItems(items, search);
+            
+            document.getElementById('itemCount').textContent = `${items.length} items`;
+            renderBrowserItems(items);
+        }
+
+        function renderBrowserItems(items) {
+            const container = document.getElementById('browserContent');
+            
+            if (items.length === 0) {
+                container.innerHTML = '<div class="text-center py-12 text-gray-400"><p class="text-xl mb-2">No items found</p><p class="text-sm">Try adjusting filters or add a custom item</p></div>';
+                return;
+            }
+            
+            let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">';
+            items.forEach(item => {
+                const supplier = SUPPLIERS[item.supplier] || SUPPLIERS.custom;
+                const cpm = item.cost && item.lifeMetres ? (item.cost / item.lifeMetres).toFixed(3) : '?';
+                const isSelected = (currentBrowserTab === 'hammers' && selectedHammer?.id === item.id) ||
+                                   (currentBrowserTab === 'bits' && selectedBit?.id === item.id) ||
+                                   (currentBrowserTab === 'pipes' && selectedPipe?.id === item.id);
+                
+                html += `
+                    <div class="product-card card rounded-lg p-3 ${isSelected ? 'selected' : ''}" onclick="selectItem('${item.id}')">
+                        <div class="flex items-start gap-3">
+                            <div class="w-16 h-16 bg-slate-700 rounded flex items-center justify-center overflow-hidden flex-shrink-0">
+                                ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='📦'">` : '📦'}
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="supplier-badge supplier-${item.supplier}">${supplier.name.split(' ')[0]}</span>
+                                    ${isSelected ? '<span class="text-green-400 text-xs">✓ Selected</span>' : ''}
+                                </div>
+                                <h3 class="font-semibold text-sm truncate">${item.name}</h3>
+                                <p class="text-xs text-gray-400 truncate">${item.partNumber}</p>
+                                <div class="flex items-center justify-between mt-2">
+                                    <span class="text-orange-400 font-semibold">$${item.cost?.toLocaleString() || '?'}</span>
+                                    <span class="text-green-400 text-xs">$${cpm}/m</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-xs text-gray-400 truncate">${item.notes || ''}</div>
+                        ${supplier.productUrl || item.productUrl ? `<a href="${item.productUrl || supplier.catalogUrl}" target="_blank" class="text-blue-400 text-xs hover:underline" onclick="event.stopPropagation()">View on supplier website →</a>` : ''}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function selectItem(itemId) {
+            let item;
+            if (currentBrowserTab === 'hammers') {
+                item = getAllHammers().find(i => i.id === itemId);
+                selectedHammer = item;
+                renderSelectedHammer();
+            } else if (currentBrowserTab === 'bits') {
+                item = getAllBits().find(i => i.id === itemId);
+                selectedBit = item;
+                renderSelectedBit();
+            } else if (currentBrowserTab === 'pipes') {
+                item = getAllPipes().find(i => i.id === itemId);
+                selectedPipe = item;
+                renderSelectedPipe();
+            }
+            
+            filterBrowser(); // Refresh to show selected state
+            updateCalculation();
+        }
+
+        function renderSelectedHammer() {
+            if (!selectedHammer) return;
+            const supplier = SUPPLIERS[selectedHammer.supplier];
+            const cpm = (selectedHammer.cost / selectedHammer.lifeMetres).toFixed(3);
+            
+            document.getElementById('selectedHammer').innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-16 h-16 bg-slate-700 rounded flex items-center justify-center overflow-hidden">
+                        ${selectedHammer.imageUrl ? `<img src="${selectedHammer.imageUrl}" alt="" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='🔨'">` : '🔨'}
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-2">
+                            <span class="supplier-badge supplier-${selectedHammer.supplier}">${supplier.name.split(' ')[0]}</span>
+                            <span class="font-semibold">${selectedHammer.name}</span>
+                        </div>
+                        <p class="text-xs text-gray-400">${selectedHammer.partNumber} | ${selectedHammer.series} | ${selectedHammer.size}" | ${selectedHammer.airConsumption} CFM</p>
+                        <div class="flex items-center gap-4 mt-1 text-sm">
+                            <span class="text-orange-400">$${selectedHammer.cost.toLocaleString()}</span>
+                            <span class="text-gray-400">${selectedHammer.lifeMetres.toLocaleString()}m life</span>
+                            <span class="text-green-400 font-semibold">$${cpm}/m</span>
+                        </div>
+                    </div>
+                </div>
+                ${selectedHammer.productUrl ? `<a href="${selectedHammer.productUrl}" target="_blank" class="text-blue-400 text-xs hover:underline mt-2 inline-block">View on ${supplier.name} →</a>` : ''}
+            `;
+        }
+
+        function renderSelectedBit() {
+            if (!selectedBit) return;
+            const supplier = SUPPLIERS[selectedBit.supplier];
+            const cpm = (selectedBit.cost / selectedBit.lifeMetres).toFixed(3);
+            
+            document.getElementById('selectedBit').innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-16 h-16 bg-slate-700 rounded flex items-center justify-center overflow-hidden">
+                        ${selectedBit.imageUrl ? `<img src="${selectedBit.imageUrl}" alt="" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='💎'">` : '💎'}
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-2">
+                            <span class="supplier-badge supplier-${selectedBit.supplier}">${supplier.name.split(' ')[0]}</span>
+                            <span class="font-semibold">${selectedBit.name}</span>
+                        </div>
+                        <p class="text-xs text-gray-400">${selectedBit.partNumber} | ${selectedBit.diameter}mm | ${selectedBit.face} | ${selectedBit.carbide}</p>
+                        <div class="flex items-center gap-4 mt-1 text-sm">
+                            <span class="text-orange-400">$${selectedBit.cost.toLocaleString()}</span>
+                            <span class="text-gray-400">${selectedBit.lifeMetres.toLocaleString()}m life</span>
+                            <span class="text-green-400 font-semibold">$${cpm}/m</span>
+                        </div>
+                    </div>
+                </div>
+                ${selectedBit.productUrl ? `<a href="${selectedBit.productUrl}" target="_blank" class="text-blue-400 text-xs hover:underline mt-2 inline-block">View on ${supplier.name} →</a>` : ''}
+            `;
+        }
+
+        function renderSelectedPipe() {
+            if (!selectedPipe) return;
+            const supplier = SUPPLIERS[selectedPipe.supplier];
+            const cpm = (selectedPipe.cost / selectedPipe.lifeMetres).toFixed(3);
+            
+            document.getElementById('selectedPipe').innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-16 h-16 bg-slate-700 rounded flex items-center justify-center overflow-hidden">
+                        ${selectedPipe.imageUrl ? `<img src="${selectedPipe.imageUrl}" alt="" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='🔧'">` : '🔧'}
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-2">
+                            <span class="supplier-badge supplier-${selectedPipe.supplier}">${supplier.name.split(' ')[0]}</span>
+                            <span class="font-semibold">${selectedPipe.name}</span>
+                        </div>
+                        <p class="text-xs text-gray-400">${selectedPipe.partNumber} | OD: ${selectedPipe.od}mm | Length: ${selectedPipe.length}mm</p>
+                        <div class="flex items-center gap-4 mt-1 text-sm">
+                            <span class="text-orange-400">$${selectedPipe.cost.toLocaleString()}</span>
+                            <span class="text-gray-400">${selectedPipe.lifeMetres.toLocaleString()}m life</span>
+                            <span class="text-green-400 font-semibold">$${cpm}/m</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // ADD NEW ITEM
+        // ============================================
+        function saveNewItem() {
+            const type = document.getElementById('newItemType').value;
+            const partNumber = document.getElementById('newPartNumber').value;
+            const name = document.getElementById('newName').value;
+            const cost = parseFloat(document.getElementById('newCost').value);
+            const life = parseInt(document.getElementById('newLife').value);
+            
+            if (!partNumber || !name || !cost || !life) {
+                alert('Please fill in required fields: Part Number, Name, Cost, and Life');
+                return;
+            }
+            
+            const newItem = {
+                partNumber,
+                name,
+                cost,
+                lifeMetres: life,
+                size: parseFloat(document.getElementById('newSize').value) || null,
+                diameter: parseInt(document.getElementById('newDiameter').value) || null,
+                series: document.getElementById('newSeries').value || '',
+                shank: document.getElementById('newShank').value || '',
+                airConsumption: parseInt(document.getElementById('newAir').value) || 0,
+                carbide: document.getElementById('newCarbide').value || '',
+                notes: document.getElementById('newNotes').value || '',
+                imageUrl: document.getElementById('newImageUrl').value || '',
+                efficiency: 0.85,
+                rigCompatibility: [currentRig]
+            };
+            
+            saveUserItem(type, newItem);
+            
+            // Clear form
+            ['newPartNumber', 'newName', 'newCost', 'newLife', 'newSize', 'newDiameter', 'newSeries', 'newShank', 'newAir', 'newCarbide', 'newNotes', 'newImageUrl'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            
+            alert('Item saved successfully!');
+            switchTab(type === 'drillString' ? 'drillstring' : type);
+        }
+
+        // ============================================
+        // SHOCK SUB
+        // ============================================
+        function toggleShockSub() {
+            shockSubEnabled = !shockSubEnabled;
+            const btn = document.getElementById('shockToggle');
+            const info = document.getElementById('shockInfo');
+            
+            if (shockSubEnabled) {
+                btn.textContent = 'ENABLED';
+                btn.classList.remove('bg-gray-600');
+                btn.classList.add('bg-green-600');
+                info.classList.remove('hidden');
+            } else {
+                btn.textContent = 'DISABLED';
+                btn.classList.add('bg-gray-600');
+                btn.classList.remove('bg-green-600');
+                info.classList.add('hidden');
+            }
+            updateCalculation();
+        }
+
+        // ============================================
+        // CALCULATION
+        // ============================================
+        function updateCalculation() {
+            const rig = RIGS[currentRig];
+            const pressure = parseFloat(document.getElementById('pressureSlider').value);
+            const holeDia = parseInt(document.getElementById('holeDiameter').value);
+            
+            document.getElementById('pressureValue').textContent = `${pressure} bar (${Math.round(pressure * 14.5)} psi)`;
+            
+            // Calculate costs
+            let hammerCPM = 0, bitCPM = 0, pipeCPM = 0, shockCPM = 0;
+            let costHTML = '';
+            let components = [];
+            
+            if (selectedHammer) {
+                hammerCPM = selectedHammer.cost / selectedHammer.lifeMetres;
+                costHTML += `<div class="flex justify-between"><span class="text-gray-400">Hammer:</span><span>$${hammerCPM.toFixed(3)}/m</span></div>`;
+                components.push({ name: 'Hammer: ' + selectedHammer.name, supplier: SUPPLIERS[selectedHammer.supplier].name, pn: selectedHammer.partNumber, cost: selectedHammer.cost, life: selectedHammer.lifeMetres, cpm: hammerCPM });
+            }
+            
+            if (selectedBit) {
+                bitCPM = selectedBit.cost / selectedBit.lifeMetres;
+                costHTML += `<div class="flex justify-between"><span class="text-gray-400">Bit:</span><span>$${bitCPM.toFixed(3)}/m</span></div>`;
+                components.push({ name: 'Bit: ' + selectedBit.name, supplier: SUPPLIERS[selectedBit.supplier].name, pn: selectedBit.partNumber, cost: selectedBit.cost, life: selectedBit.lifeMetres, cpm: bitCPM });
+            }
+            
+            if (selectedPipe) {
+                pipeCPM = selectedPipe.cost / selectedPipe.lifeMetres;
+                costHTML += `<div class="flex justify-between"><span class="text-gray-400">Pipe:</span><span>$${pipeCPM.toFixed(3)}/m</span></div>`;
+                components.push({ name: 'Pipe: ' + selectedPipe.name, supplier: SUPPLIERS[selectedPipe.supplier].name, pn: selectedPipe.partNumber, cost: selectedPipe.cost, life: selectedPipe.lifeMetres, cpm: pipeCPM });
+            }
+            
+            if (shockSubEnabled) {
+                shockCPM = rig.shock.cost / rig.shock.life;
+                costHTML += `<div class="flex justify-between text-green-400"><span>Shock Sub:</span><span>$${shockCPM.toFixed(3)}/m</span></div>`;
+                components.push({ name: 'Shock Sub', supplier: 'Sandvik', pn: '-', cost: rig.shock.cost, life: rig.shock.life, cpm: shockCPM });
+            }
+            
+            const totalCPM = hammerCPM + bitCPM + pipeCPM + shockCPM;
+            costHTML += `<div class="border-t border-gray-600 pt-1 mt-1 flex justify-between font-bold text-orange-400"><span>TOTAL:</span><span>$${totalCPM.toFixed(2)}/m</span></div>`;
+            
+            document.getElementById('costAnalysis').innerHTML = costHTML || '<p class="text-gray-400 text-sm">Select components to see cost analysis</p>';
+            document.getElementById('totalCost').textContent = `$${totalCPM.toFixed(2)} / metre`;
+            document.getElementById('costBreakdown').textContent = `H $${hammerCPM.toFixed(3)} + B $${bitCPM.toFixed(3)} + P $${pipeCPM.toFixed(3)}` + (shockSubEnabled ? ` + S $${shockCPM.toFixed(3)}` : '');
+            
+            // Calculate bailing velocity
+            let bailingVelocity = 0;
+            if (selectedHammer && selectedPipe) {
+                const cfmAvailable = rig.cfm - selectedHammer.airConsumption;
+                const pipeODInch = selectedPipe.od / 25.4;
+                const holeDiaInch = holeDia / 25.4;
+                const annularArea = Math.PI * (holeDiaInch**2 - pipeODInch**2) / 4;
+                bailingVelocity = Math.round(cfmAvailable / annularArea);
+            }
+            
+            document.getElementById('bvValue').textContent = `${bailingVelocity.toLocaleString()} fpm`;
+            const bvPct = Math.min(100, Math.max(0, (bailingVelocity - 5000) / 70));
+            document.getElementById('bvBar').style.width = `${bvPct}%`;
+            
+            let bvStatus = '', bvColor = 'bg-gray-500';
+            if (bailingVelocity < 5500) { bvStatus = '⚠️ LOW - risk of stuck pipe'; bvColor = 'bg-red-500'; }
+            else if (bailingVelocity < 7000) { bvStatus = '⚡ MARGINAL'; bvColor = 'bg-yellow-500'; }
+            else if (bailingVelocity < 9000) { bvStatus = '✓ OPTIMAL'; bvColor = 'bg-green-500'; }
+            else { bvStatus = '✓ EXCELLENT'; bvColor = 'bg-blue-500'; }
+            document.getElementById('bvStatus').innerHTML = `<span class="${bvColor.replace('bg-', 'text-')}">${bvStatus}</span>`;
+            document.getElementById('bvBar').className = `h-3 rounded transition-all ${bvColor}`;
+            
+            // Calculate efficiency
+            let efficiency = 0;
+            if (selectedHammer && selectedBit) {
+                const pressureEff = Math.min(1, pressure / rig.maxBar);
+                const airEff = selectedPipe ? Math.min(1, (rig.cfm - selectedHammer.airConsumption) / selectedHammer.airConsumption) : 0.5;
+                const matchEff = selectedHammer.efficiency * selectedBit.efficiency;
+                efficiency = Math.round((pressureEff * 0.3 + airEff * 0.3 + matchEff * 0.4) * 100);
+            }
+            
+            const circumference = 283;
+            document.getElementById('gaugeRing').setAttribute('stroke-dasharray', `${(efficiency/100)*circumference} ${circumference}`);
+            document.getElementById('gaugeRing').setAttribute('stroke', efficiency > 85 ? '#16a34a' : efficiency > 70 ? '#f59e0b' : '#dc2626');
+            document.getElementById('effValue').textContent = `${efficiency}%`;
+            document.getElementById('effStatus').innerHTML = efficiency > 85 ? '<span class="text-green-400">✓ Excellent</span>' : efficiency > 70 ? '<span class="text-yellow-400">⚡ Good</span>' : '<span class="text-red-400">⚠️ Review</span>';
+            
+            // Update print content
+            document.getElementById('pEfficiency').textContent = `${efficiency}%`;
+            document.getElementById('pBailing').textContent = `${bailingVelocity.toLocaleString()} fpm`;
+            document.getElementById('pCost').textContent = `$${totalCPM.toFixed(2)}`;
+            document.getElementById('printSubtitle').textContent = `${rig.name} - ${holeDia}mm Hole`;
+            document.getElementById('printDate').textContent = new Date().toLocaleString();
+            document.getElementById('printRig').textContent = rig.name;
+            document.getElementById('printHoleDia').textContent = `${holeDia}mm`;
+            
+            let printHTML = '';
+            components.forEach(c => {
+                printHTML += `<tr><td>${c.name}</td><td>${c.supplier}</td><td>${c.pn}</td><td>$${c.cost.toLocaleString()}</td><td>${c.life.toLocaleString()}m</td><td>$${c.cpm.toFixed(3)}</td></tr>`;
+            });
+            printHTML += `<tr style="font-weight:bold;background:#e5e5e5;"><td colspan="5" style="text-align:right;">TOTAL:</td><td>$${totalCPM.toFixed(2)}</td></tr>`;
+            document.getElementById('printComponents').innerHTML = printHTML;
+        }
+
+        // ============================================
+        // LOGO MANAGEMENT
+        // ============================================
+        function openLogoModal() {
+            document.getElementById('logoUrl').value = companyLogo;
+            if (companyLogo) {
+                document.getElementById('logoPreviewImg').src = companyLogo;
+                document.getElementById('logoPreview').classList.remove('hidden');
+            }
+            document.getElementById('logoModal').classList.remove('hidden');
+        }
+
+        function closeLogoModal() {
+            document.getElementById('logoModal').classList.add('hidden');
+        }
+
+        function saveLogo() {
+            companyLogo = document.getElementById('logoUrl').value;
+            localStorage.setItem('dth_company_logo', companyLogo);
+            loadLogo();
+            closeLogoModal();
+        }
+
+        function removeLogo() {
+            companyLogo = '';
+            localStorage.removeItem('dth_company_logo');
+            document.getElementById('headerLogoArea').classList.add('hidden');
+            document.getElementById('printLogo').style.display = 'none';
+            closeLogoModal();
+        }
+
+        document.getElementById('logoUrl').addEventListener('input', function() {
+            if (this.value) {
+                document.getElementById('logoPreviewImg').src = this.value;
+                document.getElementById('logoPreview').classList.remove('hidden');
+            } else {
+                document.getElementById('logoPreview').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
