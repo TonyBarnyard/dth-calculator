@@ -142,6 +142,16 @@
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
+                                    <label class="text-xs text-gray-400">OD - Outer Diameter (mm)</label>
+                                    <input type="number" id="newOD" class="w-full rounded px-2 py-1 text-sm">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400">Component Type</label>
+                                    <input type="text" id="newCompType" class="w-full rounded px-2 py-1 text-sm" placeholder="e.g. Sub, Deck Bush">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
                                     <label class="text-xs text-gray-400">Cost ($) *</label>
                                     <input type="number" id="newCost" class="w-full rounded px-2 py-1 text-sm" step="0.01" required>
                                 </div>
@@ -333,6 +343,17 @@
                     </div>
                 </div>
 
+                <!-- Drill String Components -->
+                <div class="card rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-semibold text-cyan-400">⚙️ Drill String Components</h2>
+                        <button onclick="openBrowser('drillstring')" class="px-3 py-1 bg-cyan-600 hover:bg-cyan-700 rounded text-xs font-semibold">Browse Database</button>
+                    </div>
+                    <div id="selectedDrillString" class="bg-slate-800 rounded p-3">
+                        <p class="text-gray-400 text-sm">No drill string components selected - click "Browse Database" to select</p>
+                    </div>
+                </div>
+
                 <!-- Operating Pressure -->
                 <div class="card rounded-lg p-4">
                     <h2 class="text-lg font-semibold mb-3 text-red-400">⚡ Operating Pressure</h2>
@@ -395,6 +416,7 @@
         let selectedHammer = null;
         let selectedBit = null;
         let selectedPipe = null;
+        let selectedDrillStringItems = []; // Array for multiple drill string components
         let shockSubEnabled = false;
         let companyLogo = localStorage.getItem('dth_company_logo') || '';
         let currentBrowserTab = 'hammers';
@@ -446,9 +468,13 @@
             selectedHammer = null;
             selectedBit = null;
             selectedPipe = null;
+            selectedDrillStringItems = [];
             document.getElementById('selectedHammer').innerHTML = '<p class="text-gray-400 text-sm">No hammer selected</p>';
             document.getElementById('selectedBit').innerHTML = '<p class="text-gray-400 text-sm">No bit selected</p>';
             document.getElementById('selectedPipe').innerHTML = '<p class="text-gray-400 text-sm">No pipe selected</p>';
+            if (document.getElementById('selectedDrillString')) {
+                document.getElementById('selectedDrillString').innerHTML = '<p class="text-gray-400 text-sm">No drill string components selected</p>';
+            }
             
             updateCalculation();
         }
@@ -541,7 +567,20 @@
                 const cpm = item.cost && item.lifeMetres ? (item.cost / item.lifeMetres).toFixed(3) : '?';
                 const isSelected = (currentBrowserTab === 'hammers' && selectedHammer?.id === item.id) ||
                                    (currentBrowserTab === 'bits' && selectedBit?.id === item.id) ||
-                                   (currentBrowserTab === 'pipes' && selectedPipe?.id === item.id);
+                                   (currentBrowserTab === 'pipes' && selectedPipe?.id === item.id) ||
+                                   (currentBrowserTab === 'drillstring' && selectedDrillStringItems.some(i => i.id === item.id));
+                
+                // Build specs string based on item type
+                let specsHtml = '';
+                if (currentBrowserTab === 'hammers' && item.od) {
+                    specsHtml = `<div class="text-xs text-cyan-400 mt-1">OD: ${item.od}mm | ${item.size}" | ${item.airConsumption || '?'} CFM</div>`;
+                } else if (currentBrowserTab === 'bits' && item.diameter) {
+                    specsHtml = `<div class="text-xs text-cyan-400 mt-1">Ø${item.diameter}mm | ${item.shank || ''} | ${item.face || ''}</div>`;
+                } else if (currentBrowserTab === 'pipes' && item.od) {
+                    specsHtml = `<div class="text-xs text-cyan-400 mt-1">OD: ${item.od}mm | ID: ${item.innerDia || '?'}mm | ${item.length || '?'}mm</div>`;
+                } else if (currentBrowserTab === 'drillstring') {
+                    specsHtml = `<div class="text-xs text-cyan-400 mt-1">${item.type || 'Component'} ${item.od ? '| OD: ' + item.od + 'mm' : ''}</div>`;
+                }
                 
                 html += `
                     <div class="product-card card rounded-lg p-3 ${isSelected ? 'selected' : ''}" onclick="selectItem('${item.id}')">
@@ -556,6 +595,7 @@
                                 </div>
                                 <h3 class="font-semibold text-sm truncate">${item.name}</h3>
                                 <p class="text-xs text-gray-400 truncate">${item.partNumber}</p>
+                                ${specsHtml}
                                 <div class="flex items-center justify-between mt-2">
                                     <span class="text-orange-400 font-semibold">$${item.cost?.toLocaleString() || '?'}</span>
                                     <span class="text-green-400 text-xs">$${cpm}/m</span>
@@ -585,6 +625,16 @@
                 item = getAllPipes().find(i => i.id === itemId);
                 selectedPipe = item;
                 renderSelectedPipe();
+            } else if (currentBrowserTab === 'drillstring') {
+                item = getAllDrillString().find(i => i.id === itemId);
+                // Toggle selection for drill string items (allow multiple)
+                const existingIndex = selectedDrillStringItems.findIndex(i => i.id === itemId);
+                if (existingIndex >= 0) {
+                    selectedDrillStringItems.splice(existingIndex, 1);
+                } else {
+                    selectedDrillStringItems.push(item);
+                }
+                renderSelectedDrillString();
             }
             
             filterBrowser(); // Refresh to show selected state
@@ -606,7 +656,7 @@
                             <span class="supplier-badge supplier-${selectedHammer.supplier}">${supplier.name.split(' ')[0]}</span>
                             <span class="font-semibold">${selectedHammer.name}</span>
                         </div>
-                        <p class="text-xs text-gray-400">${selectedHammer.partNumber} | ${selectedHammer.series} | ${selectedHammer.size}" | ${selectedHammer.airConsumption} CFM</p>
+                        <p class="text-xs text-gray-400">${selectedHammer.partNumber} | ${selectedHammer.series} | ${selectedHammer.size}" | OD: ${selectedHammer.od}mm | ${selectedHammer.airConsumption} CFM</p>
                         <div class="flex items-center gap-4 mt-1 text-sm">
                             <span class="text-orange-400">$${selectedHammer.cost.toLocaleString()}</span>
                             <span class="text-gray-400">${selectedHammer.lifeMetres.toLocaleString()}m life</span>
@@ -633,7 +683,7 @@
                             <span class="supplier-badge supplier-${selectedBit.supplier}">${supplier.name.split(' ')[0]}</span>
                             <span class="font-semibold">${selectedBit.name}</span>
                         </div>
-                        <p class="text-xs text-gray-400">${selectedBit.partNumber} | ${selectedBit.diameter}mm | ${selectedBit.face} | ${selectedBit.carbide}</p>
+                        <p class="text-xs text-gray-400">${selectedBit.partNumber} | <span class="text-cyan-400 font-semibold">Ø${selectedBit.diameter}mm</span> | ${selectedBit.face} | ${selectedBit.carbide} | ${selectedBit.shank}</p>
                         <div class="flex items-center gap-4 mt-1 text-sm">
                             <span class="text-orange-400">$${selectedBit.cost.toLocaleString()}</span>
                             <span class="text-gray-400">${selectedBit.lifeMetres.toLocaleString()}m life</span>
@@ -643,6 +693,58 @@
                 </div>
                 ${selectedBit.productUrl ? `<a href="${selectedBit.productUrl}" target="_blank" class="text-blue-400 text-xs hover:underline mt-2 inline-block">View on ${supplier.name} →</a>` : ''}
             `;
+        }
+
+        function renderSelectedDrillString() {
+            const container = document.getElementById('selectedDrillString');
+            if (!container) return;
+            
+            if (selectedDrillStringItems.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-sm">No drill string components selected - click "Browse Database" to select</p>';
+                return;
+            }
+            
+            let html = '<div class="space-y-2">';
+            let totalCPM = 0;
+            
+            selectedDrillStringItems.forEach((item, index) => {
+                const supplier = SUPPLIERS[item.supplier];
+                const cpm = item.cost && item.lifeMetres ? (item.cost / item.lifeMetres) : 0;
+                totalCPM += cpm;
+                
+                html += `
+                    <div class="flex items-center gap-3 bg-slate-700 rounded p-2">
+                        <div class="w-10 h-10 bg-slate-600 rounded flex items-center justify-center text-lg">⚙️</div>
+                        <div class="flex-grow">
+                            <div class="flex items-center gap-2">
+                                <span class="supplier-badge supplier-${item.supplier}">${supplier.name.split(' ')[0]}</span>
+                                <span class="font-semibold text-sm">${item.name}</span>
+                            </div>
+                            <p class="text-xs text-gray-400">${item.partNumber} | ${item.type || 'Component'} ${item.od ? '| OD: ' + item.od + 'mm' : ''}</p>
+                            <div class="flex items-center gap-4 mt-1 text-xs">
+                                <span class="text-orange-400">$${item.cost?.toLocaleString() || '?'}</span>
+                                <span class="text-gray-400">${item.lifeMetres?.toLocaleString() || '?'}m life</span>
+                                <span class="text-green-400">$${cpm.toFixed(3)}/m</span>
+                            </div>
+                        </div>
+                        <button onclick="removeDrillStringItem(${index})" class="text-red-400 hover:text-red-300 px-2">✕</button>
+                    </div>
+                `;
+            });
+            
+            html += `</div>
+                <div class="mt-2 pt-2 border-t border-slate-600 flex justify-between text-sm">
+                    <span class="text-gray-400">${selectedDrillStringItems.length} component(s)</span>
+                    <span class="text-green-400 font-semibold">Total: $${totalCPM.toFixed(3)}/m</span>
+                </div>`;
+            
+            container.innerHTML = html;
+        }
+
+        function removeDrillStringItem(index) {
+            selectedDrillStringItems.splice(index, 1);
+            renderSelectedDrillString();
+            updateCalculation();
         }
 
         function renderSelectedPipe() {
@@ -660,7 +762,7 @@
                             <span class="supplier-badge supplier-${selectedPipe.supplier}">${supplier.name.split(' ')[0]}</span>
                             <span class="font-semibold">${selectedPipe.name}</span>
                         </div>
-                        <p class="text-xs text-gray-400">${selectedPipe.partNumber} | OD: ${selectedPipe.od}mm | Length: ${selectedPipe.length}mm</p>
+                        <p class="text-xs text-gray-400">${selectedPipe.partNumber} | <span class="text-cyan-400">OD: ${selectedPipe.od}mm</span> | ID: ${selectedPipe.innerDia || '?'}mm | Length: ${selectedPipe.length}mm</p>
                         <div class="flex items-center gap-4 mt-1 text-sm">
                             <span class="text-orange-400">$${selectedPipe.cost.toLocaleString()}</span>
                             <span class="text-gray-400">${selectedPipe.lifeMetres.toLocaleString()}m life</span>
@@ -693,6 +795,8 @@
                 lifeMetres: life,
                 size: parseFloat(document.getElementById('newSize').value) || null,
                 diameter: parseInt(document.getElementById('newDiameter').value) || null,
+                od: parseInt(document.getElementById('newOD').value) || null,
+                type: document.getElementById('newCompType').value || '',
                 series: document.getElementById('newSeries').value || '',
                 shank: document.getElementById('newShank').value || '',
                 airConsumption: parseInt(document.getElementById('newAir').value) || 0,
@@ -706,7 +810,7 @@
             saveUserItem(type, newItem);
             
             // Clear form
-            ['newPartNumber', 'newName', 'newCost', 'newLife', 'newSize', 'newDiameter', 'newSeries', 'newShank', 'newAir', 'newCarbide', 'newNotes', 'newImageUrl'].forEach(id => {
+            ['newPartNumber', 'newName', 'newCost', 'newLife', 'newSize', 'newDiameter', 'newOD', 'newCompType', 'newSeries', 'newShank', 'newAir', 'newCarbide', 'newNotes', 'newImageUrl'].forEach(id => {
                 document.getElementById(id).value = '';
             });
             
@@ -747,7 +851,7 @@
             document.getElementById('pressureValue').textContent = `${pressure} bar (${Math.round(pressure * 14.5)} psi)`;
             
             // Calculate costs
-            let hammerCPM = 0, bitCPM = 0, pipeCPM = 0, shockCPM = 0;
+            let hammerCPM = 0, bitCPM = 0, pipeCPM = 0, shockCPM = 0, drillStringCPM = 0;
             let costHTML = '';
             let components = [];
             
@@ -775,12 +879,32 @@
                 components.push({ name: 'Shock Sub', supplier: 'Sandvik', pn: '-', cost: rig.shock.cost, life: rig.shock.life, cpm: shockCPM });
             }
             
-            const totalCPM = hammerCPM + bitCPM + pipeCPM + shockCPM;
+            // Add drill string components
+            if (selectedDrillStringItems.length > 0) {
+                selectedDrillStringItems.forEach(item => {
+                    const itemCPM = item.cost && item.lifeMetres ? item.cost / item.lifeMetres : 0;
+                    drillStringCPM += itemCPM;
+                    components.push({ 
+                        name: (item.type || 'Component') + ': ' + item.name, 
+                        supplier: SUPPLIERS[item.supplier]?.name || 'Custom', 
+                        pn: item.partNumber, 
+                        cost: item.cost || 0, 
+                        life: item.lifeMetres || 0, 
+                        cpm: itemCPM 
+                    });
+                });
+                costHTML += `<div class="flex justify-between text-cyan-400"><span>Drill String (${selectedDrillStringItems.length}):</span><span>$${drillStringCPM.toFixed(3)}/m</span></div>`;
+            }
+            
+            const totalCPM = hammerCPM + bitCPM + pipeCPM + shockCPM + drillStringCPM;
             costHTML += `<div class="border-t border-gray-600 pt-1 mt-1 flex justify-between font-bold text-orange-400"><span>TOTAL:</span><span>$${totalCPM.toFixed(2)}/m</span></div>`;
             
             document.getElementById('costAnalysis').innerHTML = costHTML || '<p class="text-gray-400 text-sm">Select components to see cost analysis</p>';
             document.getElementById('totalCost').textContent = `$${totalCPM.toFixed(2)} / metre`;
-            document.getElementById('costBreakdown').textContent = `H $${hammerCPM.toFixed(3)} + B $${bitCPM.toFixed(3)} + P $${pipeCPM.toFixed(3)}` + (shockSubEnabled ? ` + S $${shockCPM.toFixed(3)}` : '');
+            let breakdownText = `H $${hammerCPM.toFixed(3)} + B $${bitCPM.toFixed(3)} + P $${pipeCPM.toFixed(3)}`;
+            if (shockSubEnabled) breakdownText += ` + S $${shockCPM.toFixed(3)}`;
+            if (drillStringCPM > 0) breakdownText += ` + DS $${drillStringCPM.toFixed(3)}`;
+            document.getElementById('costBreakdown').textContent = breakdownText;
             
             // Calculate bailing velocity
             let bailingVelocity = 0;
