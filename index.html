@@ -1264,12 +1264,13 @@
             });
             
             container.innerHTML = html || '<div style="color: #666; font-style: italic;">No components selected</div>';
+        }
 
         // ============================================
         // LOGO MANAGEMENT (with drag & drop)
         // ============================================
         function openLogoModal() {
-            document.getElementById('logoUrl').value = companyLogo.startsWith('data:') ? '' : companyLogo;
+            document.getElementById('logoUrl').value = (companyLogo && companyLogo.startsWith('data:')) ? '' : (companyLogo || '');
             if (companyLogo) {
                 document.getElementById('logoPreviewImg').src = companyLogo;
                 document.getElementById('logoPreview').classList.remove('hidden');
@@ -1350,12 +1351,18 @@
             reader.readAsDataURL(file);
         }
 
-        document.getElementById('logoUrl').addEventListener('input', function() {
-            if (this.value) {
-                document.getElementById('logoPreviewImg').src = this.value;
-                document.getElementById('logoPreview').classList.remove('hidden');
-            } else {
-                document.getElementById('logoPreview').classList.add('hidden');
+        // Setup event listener after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoUrlInput = document.getElementById('logoUrl');
+            if (logoUrlInput) {
+                logoUrlInput.addEventListener('input', function() {
+                    if (this.value) {
+                        document.getElementById('logoPreviewImg').src = this.value;
+                        document.getElementById('logoPreview').classList.remove('hidden');
+                    } else {
+                        document.getElementById('logoPreview').classList.add('hidden');
+                    }
+                });
             }
         });
 
