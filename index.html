@@ -26,20 +26,24 @@
         
         /* Print Styles */
         @media print {
-            @page { size: A4 portrait; margin: 10mm; }
+            @page { size: A4 portrait; margin: 8mm; }
             body { background: white !important; color: black !important; font-size: 9pt; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             .print-page { background: white; color: black; }
             .print-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 5mm; }
-            .print-table th, .print-table td { border: 1px solid #333; padding: 2mm; }
-            .print-table th { background: #e5e5e5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .print-table th, .print-table td { border: 1px solid #333; padding: 2mm; text-align: center; }
+            .print-table th { background: #e5e5e5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-weight: bold; }
             .print-header { border-bottom: 2px solid black; padding-bottom: 5mm; margin-bottom: 5mm; }
-            .print-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; margin: 5mm 0; }
+            .print-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 5mm 0; }
             .print-metric-box { border: 2px solid #333; padding: 3mm; text-align: center; }
-            .print-metric-value { font-size: 16pt; font-weight: bold; }
+            .print-metric-value { font-size: 14pt; font-weight: bold; }
+            .component-block { border: 1px solid #666; background: #f0f0f0; margin: 2px 0; text-align: center; font-size: 7pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .component-image { max-height: 60px; margin: 2px auto; }
         }
         .print-only { display: none; }
+        .component-block { border: 1px solid #666; background: #f0f0f0; margin: 2px 0; text-align: center; font-size: 7pt; }
+        .drop-active { border-color: #f59e0b !important; background: rgba(245, 158, 11, 0.1) !important; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -183,11 +187,19 @@
                             </div>
                             <div>
                                 <label class="text-xs text-gray-400">Notes</label>
-                                <textarea id="newNotes" class="w-full rounded px-2 py-1 text-sm h-16"></textarea>
+                                <textarea id="newNotes" class="w-full rounded px-2 py-1 text-sm h-12"></textarea>
                             </div>
+                            <!-- Image Drop Zone -->
                             <div>
-                                <label class="text-xs text-gray-400">Image URL (optional)</label>
-                                <input type="text" id="newImageUrl" class="w-full rounded px-2 py-1 text-sm" placeholder="https://...">
+                                <label class="text-xs text-gray-400">Product Image</label>
+                                <div id="itemImageDropZone" class="border-2 border-dashed border-slate-500 rounded p-3 text-center cursor-pointer hover:border-orange-400 transition-colors text-xs">
+                                    <div id="itemImagePreview" class="hidden mb-2">
+                                        <img id="itemImagePreviewImg" src="" alt="Preview" class="max-h-16 mx-auto rounded">
+                                    </div>
+                                    <p class="text-gray-400">📷 Drop image or click to browse</p>
+                                    <input type="file" id="itemImageInput" accept="image/*" class="hidden">
+                                </div>
+                                <input type="hidden" id="newImageUrl" value="">
                             </div>
                         </div>
                     </div>
@@ -205,12 +217,20 @@
         <div class="bg-slate-800 rounded-xl max-w-md w-full p-6">
             <h2 class="text-xl font-bold text-orange-400 mb-4">🏢 Company Logo</h2>
             <div class="space-y-4">
+                <!-- Drag and Drop Zone -->
+                <div id="logoDropZone" class="border-2 border-dashed border-slate-500 rounded-lg p-8 text-center cursor-pointer hover:border-orange-400 transition-colors">
+                    <div class="text-4xl mb-2">📁</div>
+                    <p class="text-gray-400">Drag & drop logo image here</p>
+                    <p class="text-gray-500 text-sm mt-1">or click to browse</p>
+                    <input type="file" id="logoFileInput" accept="image/*" class="hidden">
+                </div>
+                <div class="text-center text-gray-500 text-sm">- or use URL -</div>
                 <div>
                     <label class="text-sm text-gray-400">Logo Image URL</label>
                     <input type="text" id="logoUrl" class="w-full rounded px-3 py-2 text-sm" placeholder="https://...">
                 </div>
                 <div id="logoPreview" class="bg-white p-4 rounded text-center hidden">
-                    <img id="logoPreviewImg" src="" alt="Preview" class="max-h-16 mx-auto">
+                    <img id="logoPreviewImg" src="" alt="Preview" class="max-h-20 mx-auto">
                 </div>
             </div>
             <div class="flex justify-end gap-3 mt-6">
@@ -221,33 +241,90 @@
         </div>
     </div>
 
-    <!-- Print Page -->
-    <div id="printPage" class="print-only print-page p-8">
-        <div class="print-header flex justify-between items-start">
-            <div id="printLogoArea"><img id="printLogo" src="" alt="" style="max-height: 50px; display: none;"></div>
+    <!-- Print Page - Technical Drawing Style -->
+    <div id="printPage" class="print-only print-page p-4" style="font-size: 9pt;">
+        <!-- Header -->
+        <div class="print-header flex justify-between items-start mb-4" style="border-bottom: 2px solid black; padding-bottom: 8px;">
+            <div>
+                <div id="printLogoArea"><img id="printLogo" src="" alt="" style="max-height: 40px; display: none;"></div>
+                <div class="mt-1">
+                    <div style="font-size: 8pt;"><strong>Supplier:</strong> <span id="printSupplier">Multi-Supplier</span></div>
+                    <div style="font-size: 8pt;"><strong>Authorised by:</strong> <span id="printAuthor">_______________</span></div>
+                </div>
+            </div>
             <div class="text-right">
-                <h1 class="text-2xl font-bold" id="printTitle">DTH DRILL STRING EVALUATION</h1>
-                <p id="printSubtitle" class="text-gray-600"></p>
+                <h1 style="font-size: 18pt; font-weight: bold; margin: 0;" id="printRigTitle">D65 DRILL STRING</h1>
+                <p style="font-size: 11pt; margin: 2px 0;" id="printStringSpec">6M LENGTH, 4.5" OD, 3" Beco THREAD</p>
             </div>
         </div>
         
-        <div class="print-metrics">
-            <div class="print-metric-box"><div class="print-metric-value" id="pEfficiency">0%</div><div class="text-xs">EFFICIENCY</div></div>
-            <div class="print-metric-box"><div class="print-metric-value" id="pBailing">0 fpm</div><div class="text-xs">BAILING VELOCITY</div></div>
-            <div class="print-metric-box"><div class="print-metric-value" id="pCost">$0.00</div><div class="text-xs">COST/METRE</div></div>
+        <!-- Component Summary Table -->
+        <table class="print-table" style="font-size: 8pt; margin-bottom: 8px;">
+            <thead>
+                <tr style="background: #e5e5e5;">
+                    <th style="width: 80px;"></th>
+                    <th>SCS Assembly / Spindle</th>
+                    <th>SAVER SUB</th>
+                    <th>DRILL PIPE/S</th>
+                    <th>HAMMER SUB</th>
+                    <th>HAMMER</th>
+                    <th>BIT</th>
+                </tr>
+            </thead>
+            <tbody id="printSummaryTable">
+                <tr><td><strong>LENGTH</strong></td><td id="ps_spindle_len">-</td><td id="ps_saver_len">-</td><td id="ps_pipe_len">-</td><td id="ps_sub_len">-</td><td id="ps_hammer_len">-</td><td id="ps_bit_len">-</td></tr>
+                <tr><td><strong>DIAMETER</strong></td><td id="ps_spindle_dia">-</td><td id="ps_saver_dia">-</td><td id="ps_pipe_dia">-</td><td id="ps_sub_dia">-</td><td id="ps_hammer_dia">-</td><td id="ps_bit_dia">-</td></tr>
+                <tr><td><strong>TOP THREAD</strong></td><td id="ps_spindle_top">-</td><td id="ps_saver_top">-</td><td id="ps_pipe_top">-</td><td id="ps_sub_top">-</td><td id="ps_hammer_top">-</td><td>-</td></tr>
+                <tr><td><strong>BOTTOM</strong></td><td id="ps_spindle_bot">-</td><td id="ps_saver_bot">-</td><td id="ps_pipe_bot">-</td><td id="ps_sub_bot">-</td><td id="ps_hammer_bot">-</td><td>-</td></tr>
+                <tr><td><strong>WEIGHT</strong></td><td id="ps_spindle_wt">-</td><td id="ps_saver_wt">-</td><td id="ps_pipe_wt">-</td><td id="ps_sub_wt">-</td><td id="ps_hammer_wt">-</td><td id="ps_bit_wt">-</td></tr>
+                <tr><td><strong>PART NUMBER</strong></td><td id="ps_spindle_pn">-</td><td id="ps_saver_pn">-</td><td id="ps_pipe_pn">-</td><td id="ps_sub_pn">-</td><td id="ps_hammer_pn">-</td><td id="ps_bit_pn">-</td></tr>
+            </tbody>
+        </table>
+
+        <!-- Visual Drill String Drawing -->
+        <div style="display: flex; margin: 10px 0;">
+            <!-- Left side - Component details -->
+            <div style="width: 35%; font-size: 7pt; padding-right: 10px;">
+                <div style="font-weight: bold; border-bottom: 1px solid black; margin-bottom: 5px;">DTH DRILL STRING</div>
+                <div id="printComponentDetails"></div>
+            </div>
+            
+            <!-- Right side - Visual representation -->
+            <div style="width: 65%; position: relative;">
+                <div id="printVisualString" style="display: flex; flex-direction: column; align-items: center; padding: 10px; background: #f9f9f9; border: 1px solid #ccc;">
+                    <!-- Components will be rendered here as visual blocks -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Summary -->
+        <div class="print-metrics" style="margin-top: 10px;">
+            <div class="print-metric-box"><div class="print-metric-value" id="pEfficiency">0%</div><div style="font-size: 8pt;">EFFICIENCY</div></div>
+            <div class="print-metric-box"><div class="print-metric-value" id="pBailing">0 fpm</div><div style="font-size: 8pt;">BAILING VELOCITY</div></div>
+            <div class="print-metric-box"><div class="print-metric-value" id="pCost">$0.00</div><div style="font-size: 8pt;">COST/METRE</div></div>
+            <div class="print-metric-box"><div class="print-metric-value" id="pTotalLength">0mm</div><div style="font-size: 8pt;">TOTAL LENGTH</div></div>
         </div>
         
-        <table class="print-table">
+        <!-- Cost Breakdown Table -->
+        <table class="print-table" style="margin-top: 10px;">
             <thead>
                 <tr><th>Component</th><th>Supplier</th><th>Part Number</th><th>Cost</th><th>Life</th><th>$/m</th></tr>
             </thead>
             <tbody id="printComponents"></tbody>
         </table>
         
-        <div class="mt-4 text-xs">
-            <strong>Generated:</strong> <span id="printDate"></span> | 
-            <strong>Rig:</strong> <span id="printRig"></span> | 
-            <strong>Hole Diameter:</strong> <span id="printHoleDia"></span>
+        <!-- Footer -->
+        <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 8pt; border-top: 1px solid #ccc; padding-top: 5px;">
+            <div>
+                <strong>Generated:</strong> <span id="printDate"></span> | 
+                <strong>Rig:</strong> <span id="printRig"></span> | 
+                <strong>Hole Diameter:</strong> <span id="printHoleDia"></span>
+            </div>
+            <div style="text-align: right;">
+                <div><strong>RIG MAKE:</strong> <span id="printRigMake">Epiroc</span></div>
+                <div><strong>MAKE/MODEL:</strong> <span id="printRigModel">D65</span></div>
+                <div style="font-size: 7pt; color: #666;">NOT TO SCALE DRAWING</div>
+            </div>
         </div>
     </div>
 
@@ -500,6 +577,8 @@
                 document.getElementById('browserContent').classList.add('hidden');
                 document.getElementById('addNewForm').classList.remove('hidden');
                 document.querySelector('.p-3.bg-slate-700').classList.add('hidden');
+                // Setup image drop zone after a short delay to ensure DOM is ready
+                setTimeout(setupItemImageDropZone, 100);
             } else {
                 document.getElementById('browserContent').classList.remove('hidden');
                 document.getElementById('addNewForm').classList.add('hidden');
@@ -813,6 +892,9 @@
             ['newPartNumber', 'newName', 'newCost', 'newLife', 'newSize', 'newDiameter', 'newOD', 'newCompType', 'newSeries', 'newShank', 'newAir', 'newCarbide', 'newNotes', 'newImageUrl'].forEach(id => {
                 document.getElementById(id).value = '';
             });
+            // Clear image preview
+            document.getElementById('itemImagePreview').classList.add('hidden');
+            document.getElementById('itemImagePreviewImg').src = '';
             
             alert('Item saved successfully!');
             switchTab(type === 'drillString' ? 'drillstring' : type);
@@ -943,33 +1025,259 @@
             document.getElementById('effValue').textContent = `${efficiency}%`;
             document.getElementById('effStatus').innerHTML = efficiency > 85 ? '<span class="text-green-400">✓ Excellent</span>' : efficiency > 70 ? '<span class="text-yellow-400">⚡ Good</span>' : '<span class="text-red-400">⚠️ Review</span>';
             
-            // Update print content
+            // Calculate total string length
+            let totalLength = 0;
+            if (selectedHammer) totalLength += selectedHammer.length || 0;
+            if (selectedBit) totalLength += selectedBit.weight ? 50 : 0; // Approximate bit length
+            if (selectedPipe) totalLength += selectedPipe.length || 0;
+            selectedDrillStringItems.forEach(item => {
+                totalLength += item.length || 0;
+            });
+            
+            // Update print content - Technical Drawing Style
             document.getElementById('pEfficiency').textContent = `${efficiency}%`;
             document.getElementById('pBailing').textContent = `${bailingVelocity.toLocaleString()} fpm`;
             document.getElementById('pCost').textContent = `$${totalCPM.toFixed(2)}`;
-            document.getElementById('printSubtitle').textContent = `${rig.name} - ${holeDia}mm Hole`;
+            document.getElementById('pTotalLength').textContent = `${(totalLength/1000).toFixed(1)}m`;
+            
+            // Update header info
+            const rigShortName = currentRig === 'D65' ? 'D65' : 'MD6250';
+            const pipeOD = selectedPipe ? `${selectedPipe.odInch || (selectedPipe.od/25.4).toFixed(1)}"` : '?';
+            document.getElementById('printRigTitle').textContent = `${rigShortName} DRILL STRING`;
+            document.getElementById('printStringSpec').textContent = `${(totalLength/1000).toFixed(1)}M LENGTH, ${pipeOD} OD, ${holeDia}mm HOLE`;
+            
             document.getElementById('printDate').textContent = new Date().toLocaleString();
             document.getElementById('printRig').textContent = rig.name;
             document.getElementById('printHoleDia').textContent = `${holeDia}mm`;
+            document.getElementById('printRigMake').textContent = currentRig === 'D65' ? 'Epiroc' : 'Caterpillar';
+            document.getElementById('printRigModel').textContent = rigShortName;
             
+            // Build cost table
             let printHTML = '';
             components.forEach(c => {
-                printHTML += `<tr><td>${c.name}</td><td>${c.supplier}</td><td>${c.pn}</td><td>$${c.cost.toLocaleString()}</td><td>${c.life.toLocaleString()}m</td><td>$${c.cpm.toFixed(3)}</td></tr>`;
+                printHTML += `<tr><td style="text-align:left;">${c.name}</td><td>${c.supplier}</td><td>${c.pn}</td><td>$${c.cost.toLocaleString()}</td><td>${c.life.toLocaleString()}m</td><td>$${c.cpm.toFixed(3)}</td></tr>`;
             });
             printHTML += `<tr style="font-weight:bold;background:#e5e5e5;"><td colspan="5" style="text-align:right;">TOTAL:</td><td>$${totalCPM.toFixed(2)}</td></tr>`;
             document.getElementById('printComponents').innerHTML = printHTML;
+            
+            // Build summary table columns
+            updatePrintSummaryTable();
+            
+            // Build visual string representation
+            updatePrintVisualString();
+            
+            // Build component details list
+            updatePrintComponentDetails();
         }
+        
+        function updatePrintSummaryTable() {
+            // Find specific component types from drill string items
+            const saverSub = selectedDrillStringItems.find(i => i.type?.toLowerCase().includes('saver') || i.name?.toLowerCase().includes('saver'));
+            const hammerSub = selectedDrillStringItems.find(i => i.type?.toLowerCase().includes('hammer sub') || i.name?.toLowerCase().includes('hammer sub'));
+            const spindle = selectedDrillStringItems.find(i => i.type?.toLowerCase().includes('spindle') || i.name?.toLowerCase().includes('spindle') || i.type?.toLowerCase().includes('assembly'));
+            
+            // Spindle/SCS Assembly
+            if (spindle) {
+                document.getElementById('ps_spindle_len').textContent = spindle.length ? `${spindle.length}` : '-';
+                document.getElementById('ps_spindle_dia').textContent = spindle.od ? `${spindle.od}mm` : '-';
+                document.getElementById('ps_spindle_top').textContent = spindle.topThread || '-';
+                document.getElementById('ps_spindle_bot').textContent = spindle.bottomThread || '-';
+                document.getElementById('ps_spindle_wt').textContent = spindle.weight ? `${spindle.weight}kg` : '-';
+                document.getElementById('ps_spindle_pn').textContent = spindle.partNumber || '-';
+            }
+            
+            // Saver Sub
+            if (saverSub) {
+                document.getElementById('ps_saver_len').textContent = saverSub.length ? `${saverSub.length}` : '-';
+                document.getElementById('ps_saver_dia').textContent = saverSub.od ? `${saverSub.od}mm` : '-';
+                document.getElementById('ps_saver_top').textContent = saverSub.topThread || '-';
+                document.getElementById('ps_saver_bot').textContent = saverSub.bottomThread || '-';
+                document.getElementById('ps_saver_wt').textContent = saverSub.weight ? `${saverSub.weight}kg` : '-';
+                document.getElementById('ps_saver_pn').textContent = saverSub.partNumber || '-';
+            }
+            
+            // Pipe
+            if (selectedPipe) {
+                document.getElementById('ps_pipe_len').textContent = selectedPipe.length ? `${selectedPipe.length}` : '-';
+                document.getElementById('ps_pipe_dia').textContent = selectedPipe.od ? `${selectedPipe.od}mm` : '-';
+                document.getElementById('ps_pipe_top').textContent = selectedPipe.topThread || '-';
+                document.getElementById('ps_pipe_bot').textContent = selectedPipe.bottomThread || '-';
+                document.getElementById('ps_pipe_wt').textContent = selectedPipe.weight ? `${selectedPipe.weight}kg` : '-';
+                document.getElementById('ps_pipe_pn').textContent = selectedPipe.partNumber || '-';
+            }
+            
+            // Hammer Sub
+            if (hammerSub) {
+                document.getElementById('ps_sub_len').textContent = hammerSub.length ? `${hammerSub.length}` : '-';
+                document.getElementById('ps_sub_dia').textContent = hammerSub.od ? `${hammerSub.od}mm` : '-';
+                document.getElementById('ps_sub_top').textContent = hammerSub.topThread || '-';
+                document.getElementById('ps_sub_bot').textContent = hammerSub.bottomThread || '-';
+                document.getElementById('ps_sub_wt').textContent = hammerSub.weight ? `${hammerSub.weight}kg` : '-';
+                document.getElementById('ps_sub_pn').textContent = hammerSub.partNumber || '-';
+            }
+            
+            // Hammer
+            if (selectedHammer) {
+                document.getElementById('ps_hammer_len').textContent = selectedHammer.length ? `${selectedHammer.length}` : '-';
+                document.getElementById('ps_hammer_dia').textContent = selectedHammer.od ? `${selectedHammer.od}mm` : '-';
+                document.getElementById('ps_hammer_top').textContent = selectedHammer.topSub || '-';
+                document.getElementById('ps_hammer_bot').textContent = selectedHammer.shank || '-';
+                document.getElementById('ps_hammer_wt').textContent = selectedHammer.weight ? `${selectedHammer.weight}kg` : '-';
+                document.getElementById('ps_hammer_pn').textContent = selectedHammer.partNumber || '-';
+            }
+            
+            // Bit
+            if (selectedBit) {
+                document.getElementById('ps_bit_len').textContent = '-';
+                document.getElementById('ps_bit_dia').textContent = selectedBit.diameter ? `Ø${selectedBit.diameter}mm` : '-';
+                document.getElementById('ps_bit_wt').textContent = selectedBit.weight ? `${selectedBit.weight}kg` : '-';
+                document.getElementById('ps_bit_pn').textContent = selectedBit.partNumber || '-';
+            }
+        }
+        
+        function updatePrintVisualString() {
+            const container = document.getElementById('printVisualString');
+            let html = '';
+            
+            // Order: Spindle -> Saver Sub -> Pipes -> Other DS Items -> Hammer -> Bit
+            const orderedComponents = [];
+            
+            // Spindle/Assembly first
+            const spindle = selectedDrillStringItems.find(i => i.type?.toLowerCase().includes('spindle') || i.type?.toLowerCase().includes('assembly'));
+            if (spindle) orderedComponents.push({ ...spindle, displayType: 'SPINDLE/ASSEMBLY' });
+            
+            // Saver Sub
+            const saverSub = selectedDrillStringItems.find(i => i.type?.toLowerCase().includes('saver'));
+            if (saverSub) orderedComponents.push({ ...saverSub, displayType: 'SAVER SUB' });
+            
+            // Pipes
+            if (selectedPipe) orderedComponents.push({ ...selectedPipe, displayType: 'DRILL PIPE', isMainComponent: true });
+            
+            // Other drill string items (deck bushes, adapters, etc.)
+            selectedDrillStringItems.forEach(item => {
+                if (item !== spindle && item !== saverSub && !item.type?.toLowerCase().includes('hammer sub')) {
+                    orderedComponents.push({ ...item, displayType: item.type || 'COMPONENT' });
+                }
+            });
+            
+            // Hammer Sub
+            const hammerSub = selectedDrillStringItems.find(i => i.type?.toLowerCase().includes('hammer sub'));
+            if (hammerSub) orderedComponents.push({ ...hammerSub, displayType: 'HAMMER SUB' });
+            
+            // Hammer
+            if (selectedHammer) orderedComponents.push({ ...selectedHammer, displayType: 'HAMMER', isMainComponent: true });
+            
+            // Bit
+            if (selectedBit) orderedComponents.push({ ...selectedBit, displayType: 'BIT', isMainComponent: true });
+            
+            orderedComponents.forEach((comp, idx) => {
+                const width = comp.isMainComponent ? 80 : 60;
+                const height = comp.displayType === 'DRILL PIPE' ? 120 : (comp.displayType === 'HAMMER' ? 100 : 50);
+                const bgColor = comp.isMainComponent ? '#333' : '#666';
+                
+                html += `
+                    <div class="component-block" style="width: ${width}px; min-height: ${height}px; background: ${bgColor}; color: white; padding: 5px; border-radius: 3px;">
+                        ${comp.imageUrl ? `<img src="${comp.imageUrl}" class="component-image" style="max-height: ${height-20}px; filter: brightness(1.2);" onerror="this.style.display='none'">` : ''}
+                        <div style="font-size: 6pt; font-weight: bold;">${comp.displayType}</div>
+                        <div style="font-size: 5pt;">${comp.partNumber || ''}</div>
+                    </div>
+                `;
+            });
+            
+            if (orderedComponents.length === 0) {
+                html = '<div style="padding: 20px; color: #666; font-style: italic;">No components selected</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function updatePrintComponentDetails() {
+            const container = document.getElementById('printComponentDetails');
+            let html = '';
+            
+            // Build detailed component list
+            const allItems = [];
+            
+            // Add drill string items first
+            selectedDrillStringItems.forEach(item => {
+                allItems.push({
+                    title: (item.type || 'COMPONENT').toUpperCase(),
+                    partNumber: item.partNumber || '-',
+                    topThread: item.topThread || '-',
+                    bottomThread: item.bottomThread || '-',
+                    weight: item.weight || 0,
+                    length: item.length || 0
+                });
+            });
+            
+            // Add pipe
+            if (selectedPipe) {
+                allItems.push({
+                    title: 'DRILL PIPE',
+                    partNumber: selectedPipe.partNumber || '-',
+                    topThread: selectedPipe.topThread || '-',
+                    bottomThread: selectedPipe.bottomThread || '-',
+                    weight: selectedPipe.weight || 0,
+                    length: selectedPipe.length || 0,
+                    od: selectedPipe.od
+                });
+            }
+            
+            // Add hammer
+            if (selectedHammer) {
+                allItems.push({
+                    title: `${selectedHammer.size}" HAMMER`,
+                    partNumber: selectedHammer.partNumber || '-',
+                    topThread: selectedHammer.topSub || '-',
+                    bottomThread: selectedHammer.shank || '-',
+                    weight: selectedHammer.weight || 0,
+                    length: selectedHammer.length || 0
+                });
+            }
+            
+            // Add bit
+            if (selectedBit) {
+                allItems.push({
+                    title: `${selectedBit.diameter}mm BIT`,
+                    partNumber: selectedBit.partNumber || '-',
+                    shank: selectedBit.shank || '-',
+                    face: selectedBit.face || '-',
+                    carbide: selectedBit.carbide || '-'
+                });
+            }
+            
+            allItems.forEach(item => {
+                html += `
+                    <div style="border: 1px solid #999; padding: 3px; margin-bottom: 5px; background: #f5f5f5;">
+                        <div style="font-weight: bold; border-bottom: 1px solid #ccc; margin-bottom: 2px;">${item.title}</div>
+                        <table style="width: 100%; font-size: 6pt;">
+                            <tr><td style="width: 50%;">PART NUMBER</td><td>${item.partNumber}</td></tr>
+                            ${item.topThread ? `<tr><td>TOP THREAD</td><td>${item.topThread}</td></tr>` : ''}
+                            ${item.bottomThread ? `<tr><td>BOTTOM THREAD</td><td>${item.bottomThread}</td></tr>` : ''}
+                            ${item.shank ? `<tr><td>SHANK</td><td>${item.shank}</td></tr>` : ''}
+                            ${item.carbide ? `<tr><td>CARBIDE</td><td>${item.carbide}</td></tr>` : ''}
+                            ${item.weight ? `<tr><td>WEIGHT</td><td>${item.weight}kg</td></tr>` : ''}
+                            ${item.length ? `<tr><td>LENGTH</td><td>${item.length}mm</td></tr>` : ''}
+                        </table>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html || '<div style="color: #666; font-style: italic;">No components selected</div>';
 
         // ============================================
-        // LOGO MANAGEMENT
+        // LOGO MANAGEMENT (with drag & drop)
         // ============================================
         function openLogoModal() {
-            document.getElementById('logoUrl').value = companyLogo;
+            document.getElementById('logoUrl').value = companyLogo.startsWith('data:') ? '' : companyLogo;
             if (companyLogo) {
                 document.getElementById('logoPreviewImg').src = companyLogo;
                 document.getElementById('logoPreview').classList.remove('hidden');
+            } else {
+                document.getElementById('logoPreview').classList.add('hidden');
             }
             document.getElementById('logoModal').classList.remove('hidden');
+            setupLogoDropZone();
         }
 
         function closeLogoModal() {
@@ -977,7 +1285,16 @@
         }
 
         function saveLogo() {
-            companyLogo = document.getElementById('logoUrl').value;
+            const urlValue = document.getElementById('logoUrl').value;
+            const previewSrc = document.getElementById('logoPreviewImg').src;
+            
+            // Use preview src if it's a data URL (from drag/drop), otherwise use URL input
+            if (previewSrc && previewSrc.startsWith('data:')) {
+                companyLogo = previewSrc;
+            } else if (urlValue) {
+                companyLogo = urlValue;
+            }
+            
             localStorage.setItem('dth_company_logo', companyLogo);
             loadLogo();
             closeLogoModal();
@@ -988,7 +1305,49 @@
             localStorage.removeItem('dth_company_logo');
             document.getElementById('headerLogoArea').classList.add('hidden');
             document.getElementById('printLogo').style.display = 'none';
+            document.getElementById('logoPreview').classList.add('hidden');
             closeLogoModal();
+        }
+
+        function setupLogoDropZone() {
+            const dropZone = document.getElementById('logoDropZone');
+            const fileInput = document.getElementById('logoFileInput');
+            
+            dropZone.onclick = () => fileInput.click();
+            
+            dropZone.ondragover = (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drop-active');
+            };
+            
+            dropZone.ondragleave = () => {
+                dropZone.classList.remove('drop-active');
+            };
+            
+            dropZone.ondrop = (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drop-active');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    processImageFile(file, 'logoPreviewImg', 'logoPreview');
+                }
+            };
+            
+            fileInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    processImageFile(file, 'logoPreviewImg', 'logoPreview');
+                }
+            };
+        }
+
+        function processImageFile(file, previewImgId, previewContainerId) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById(previewImgId).src = e.target.result;
+                document.getElementById(previewContainerId).classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
         }
 
         document.getElementById('logoUrl').addEventListener('input', function() {
@@ -999,6 +1358,53 @@
                 document.getElementById('logoPreview').classList.add('hidden');
             }
         });
+
+        // ============================================
+        // ITEM IMAGE DROP ZONE
+        // ============================================
+        function setupItemImageDropZone() {
+            const dropZone = document.getElementById('itemImageDropZone');
+            const fileInput = document.getElementById('itemImageInput');
+            
+            if (!dropZone || !fileInput) return;
+            
+            dropZone.onclick = () => fileInput.click();
+            
+            dropZone.ondragover = (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drop-active');
+            };
+            
+            dropZone.ondragleave = () => {
+                dropZone.classList.remove('drop-active');
+            };
+            
+            dropZone.ondrop = (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drop-active');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    processItemImage(file);
+                }
+            };
+            
+            fileInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    processItemImage(file);
+                }
+            };
+        }
+
+        function processItemImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('itemImagePreviewImg').src = e.target.result;
+                document.getElementById('itemImagePreview').classList.remove('hidden');
+                document.getElementById('newImageUrl').value = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
     </script>
 </body>
 </html>
