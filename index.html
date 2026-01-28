@@ -23,19 +23,19 @@
         .tab-btn.active { background: #f59e0b; color: black; }
         .modal-overlay { background: rgba(0,0,0,0.8); }
         @media print {
-            @page { size: A4 portrait; margin: 8mm; }
-            body { background: white !important; color: black !important; font-size: 9pt; }
+            @page { size: A4 portrait; margin: 6mm; }
+            body { background: white !important; color: black !important; font-size: 8pt; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             .print-page { background: white; color: black; }
-            .print-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 5mm; }
-            .print-table th, .print-table td { border: 1px solid #333; padding: 2mm; text-align: center; }
+            .print-table { width: 100%; border-collapse: collapse; font-size: 7pt; margin-bottom: 3mm; }
+            .print-table th, .print-table td { border: 1px solid #333; padding: 1.5mm; text-align: center; }
             .print-table th { background: #e5e5e5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-weight: bold; }
-            .print-header { border-bottom: 2px solid black; padding-bottom: 5mm; margin-bottom: 5mm; }
-            .print-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 5mm 0; }
-            .print-metric-box { border: 2px solid #333; padding: 3mm; text-align: center; }
-            .print-metric-value { font-size: 14pt; font-weight: bold; }
-            .component-block { border: 1px solid #666; background: #f0f0f0; margin: 2px 0; text-align: center; font-size: 7pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .print-header { border-bottom: 2px solid black; padding-bottom: 3mm; margin-bottom: 3mm; }
+            .print-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2mm; margin: 3mm 0; }
+            .print-metric-box { border: 2px solid #333; padding: 2mm; text-align: center; }
+            .print-metric-value { font-size: 12pt; font-weight: bold; }
+            .component-block { border: 1px solid #666; background: #f0f0f0; margin: 1px 0; text-align: center; font-size: 6pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
         .print-only { display: none; }
         .drop-active { border-color: #f59e0b !important; background: rgba(245, 158, 11, 0.1) !important; }
@@ -209,21 +209,21 @@
 </div></div></div>
 
 <!-- Print Page -->
-<div id="printPage" class="print-only print-page p-4" style="font-size: 9pt;">
-<div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 8px;">
-<div><div id="printLogoArea"><img id="printLogo" src="" alt="" style="max-height: 40px; display: none;"></div><div style="font-size: 8pt; margin-top: 5px;"><div><strong>Supplier:</strong> Multi-Supplier</div><div><strong>Authorised by:</strong> _______________</div></div></div>
-<div style="text-align: right;"><h1 style="font-size: 20pt; font-weight: bold; margin: 0;" id="printRigTitle">D65 DRILL STRING</h1><p style="font-size: 11pt; margin: 2px 0;" id="printStringSpec">6M LENGTH, 4.5" OD, 165mm HOLE</p></div>
+<div id="printPage" class="print-only print-page p-2" style="font-size: 8pt;">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid black; padding-bottom: 3px; margin-bottom: 4px;">
+<div><div id="printLogoArea"><img id="printLogo" src="" alt="" style="max-height: 35px; display: none;"></div><div style="font-size: 7pt; margin-top: 3px;"><div><strong>Supplier:</strong> Multi-Supplier</div><div><strong>Authorised by:</strong> _______________</div></div></div>
+<div style="text-align: right;"><h1 style="font-size: 18pt; font-weight: bold; margin: 0;" id="printRigTitle">D65 DRILL STRING</h1><p style="font-size: 10pt; margin: 2px 0;" id="printStringSpec">6M LENGTH, 4.5" OD, 165mm HOLE</p></div>
 </div>
-<table class="print-table" style="font-size: 7pt;"><thead><tr style="background: #e5e5e5;"><th style="width: 70px;"></th><th>SCS Assembly / Spindle</th><th>SAVER SUB</th><th>DRILL PIPE/S</th><th>HAMMER SUB</th><th>HAMMER</th><th>BIT</th></tr></thead>
+<table class="print-table" style="font-size: 6pt;"><thead><tr style="background: #e5e5e5;"><th style="width: 60px;"></th><th>SCS/Spindle</th><th>SAVER SUB</th><th>DRILL PIPE</th><th>HAMMER SUB</th><th>HAMMER</th><th>BIT</th></tr></thead>
 <tbody id="printSummaryTable"><tr><td><strong>LENGTH</strong></td><td id="ps_spindle_len">-</td><td id="ps_saver_len">-</td><td id="ps_pipe_len">-</td><td id="ps_sub_len">-</td><td id="ps_hammer_len">-</td><td id="ps_bit_len">-</td></tr>
 <tr><td><strong>DIAMETER</strong></td><td id="ps_spindle_dia">-</td><td id="ps_saver_dia">-</td><td id="ps_pipe_dia">-</td><td id="ps_sub_dia">-</td><td id="ps_hammer_dia">-</td><td id="ps_bit_dia">-</td></tr>
 <tr><td><strong>TOP THREAD</strong></td><td id="ps_spindle_top">-</td><td id="ps_saver_top">-</td><td id="ps_pipe_top">-</td><td id="ps_sub_top">-</td><td id="ps_hammer_top">-</td><td>-</td></tr>
 <tr><td><strong>BOTTOM</strong></td><td id="ps_spindle_bot">-</td><td id="ps_saver_bot">-</td><td id="ps_pipe_bot">-</td><td id="ps_sub_bot">-</td><td id="ps_hammer_bot">-</td><td>-</td></tr>
 <tr><td><strong>WEIGHT</strong></td><td id="ps_spindle_wt">-</td><td id="ps_saver_wt">-</td><td id="ps_pipe_wt">-</td><td id="ps_sub_wt">-</td><td id="ps_hammer_wt">-</td><td id="ps_bit_wt">-</td></tr>
 <tr><td><strong>PART NUMBER</strong></td><td id="ps_spindle_pn">-</td><td id="ps_saver_pn">-</td><td id="ps_pipe_pn">-</td><td id="ps_sub_pn">-</td><td id="ps_hammer_pn">-</td><td id="ps_bit_pn">-</td></tr></tbody></table>
-<div style="display: flex; gap: 10px; margin-top: 5px;"><div style="width: 40%; font-size: 7pt;" id="printComponentDetails"></div><div style="width: 60%;"><div id="printVisualString" style="display: flex; flex-direction: column; align-items: center; background: #f5f5f5; padding: 10px; border: 1px solid #ccc; min-height: 300px;"></div></div></div>
-<div class="print-metrics" style="margin-top: 8px;"><div class="print-metric-box"><div class="print-metric-value" id="pEfficiency">0%</div><div style="font-size: 8pt;">EFFICIENCY</div></div><div class="print-metric-box"><div class="print-metric-value" id="pBailing">0 fpm</div><div style="font-size: 8pt;">BAILING VELOCITY</div></div><div class="print-metric-box"><div class="print-metric-value" id="pCost">$0.00</div><div style="font-size: 8pt;">COST/METRE</div></div><div class="print-metric-box"><div class="print-metric-value" id="pTotalLength">0m</div><div style="font-size: 8pt;">TOTAL LENGTH</div></div></div>
-<div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 7pt; border-top: 1px solid #ccc; padding-top: 3px;"><div><strong>Generated:</strong> <span id="printDate"></span> | <strong>Rig:</strong> <span id="printRig"></span> | <strong>Hole:</strong> <span id="printHoleDia"></span></div><div style="text-align: right; font-style: italic; color: #666;">NOT TO SCALE DRAWING</div></div>
+<div style="display: flex; gap: 6px; margin-top: 3px; align-items: flex-start;"><div style="width: 55%; font-size: 6pt;" id="printComponentDetails"></div><div style="width: 45%;"><div id="printVisualString" style="display: flex; flex-direction: column; align-items: center; background: #f5f5f5; padding: 6px; border: 1px solid #ccc; min-height: 200px;"></div></div></div>
+<div class="print-metrics" style="margin-top: 4px;"><div class="print-metric-box"><div class="print-metric-value" id="pEfficiency">0%</div><div style="font-size: 7pt;">EFFICIENCY</div></div><div class="print-metric-box"><div class="print-metric-value" id="pBailing">0 fpm</div><div style="font-size: 7pt;">BAILING VELOCITY</div></div><div class="print-metric-box"><div class="print-metric-value" id="pCost">$0.00</div><div style="font-size: 7pt;">COST/METRE</div></div><div class="print-metric-box"><div class="print-metric-value" id="pTotalLength">0m</div><div style="font-size: 7pt;">TOTAL LENGTH</div></div></div>
+<div style="display: flex; justify-content: space-between; margin-top: 3px; font-size: 6pt; border-top: 1px solid #ccc; padding-top: 2px;"><div><strong>Generated:</strong> <span id="printDate"></span> | <strong>Rig:</strong> <span id="printRig"></span> | <strong>Hole:</strong> <span id="printHoleDia"></span></div><div style="text-align: right; font-style: italic; color: #666;">NOT TO SCALE</div></div>
 </div>
 
 <!-- Header -->
@@ -306,7 +306,7 @@
 <script src="database.js"></script>
 <script>
 let currentRig='D65',selectedHammer=null,selectedBit=null,selectedPipe=null,selectedDrillStringItems=[],shockSubEnabled=false,shockPenRateAdjust=7,companyLogo=localStorage.getItem('dth_company_logo')||'',currentBrowserTab='hammers';
-const RIGS={'D65':{name:'Epiroc SmartROC D65',cfm:995,maxBar:30,holeSizes:[105,115,127,140,152,165,178,190],shock:{cost:15000,life:50000}},'MD6250':{name:'Cat MD6250',cfm:1350,maxBar:34.4,holeSizes:[200,203,216,229,251,254,270],shock:{cost:40000,life:75000}}};
+const RIGS={'D65':{name:'Epiroc SmartROC D65',cfm:995,maxBar:30,holeSizes:[105,115,127,140,152,165,178,190,203,216,229],shock:{cost:15000,life:50000}},'MD6250':{name:'Cat MD6250',cfm:1350,maxBar:34.4,holeSizes:[200,203,216,229,251,254,270],shock:{cost:40000,life:75000}}};
 
 document.addEventListener('DOMContentLoaded',()=>{loadLogo();updateRigConfig();setupDropZones();});
 
@@ -357,9 +357,9 @@ function adjustPenRate(d){const s=document.getElementById('penRateSlider');s.val
 
 function updateCalculation(){const rig=RIGS[currentRig],pressure=parseFloat(document.getElementById('pressureSlider').value),holeDia=parseInt(document.getElementById('holeDiameter').value)||rig.holeSizes[0],rockFactor=parseFloat(document.getElementById('rockSlider').value);document.getElementById('pressureValue').textContent=pressure+' bar ('+Math.round(pressure*14.5)+' psi)';document.getElementById('rockValue').textContent=rockFactor+(rockFactor<=2?' Soft':rockFactor<=3.5?' Med':' Hard');let hammerCPM=0,bitCPM=0,pipeCPM=0,shockCPM=0,dsCPM=0,costHTML='',totalLength=0;if(selectedHammer){hammerCPM=selectedHammer.cost/selectedHammer.lifeMetres;costHTML+='<div class="flex justify-between"><span class="text-gray-400">Hammer:</span><span>$'+hammerCPM.toFixed(3)+'/m</span></div>';totalLength+=selectedHammer.length||0;}if(selectedBit){bitCPM=selectedBit.cost/selectedBit.lifeMetres;costHTML+='<div class="flex justify-between"><span class="text-gray-400">Bit:</span><span>$'+bitCPM.toFixed(3)+'/m</span></div>';}if(selectedPipe){pipeCPM=selectedPipe.cost/selectedPipe.lifeMetres;costHTML+='<div class="flex justify-between"><span class="text-gray-400">Pipe:</span><span>$'+pipeCPM.toFixed(3)+'/m</span></div>';totalLength+=selectedPipe.length||0;}if(shockSubEnabled){shockCPM=rig.shock.cost/rig.shock.life;costHTML+='<div class="flex justify-between text-green-400"><span>Shock:</span><span>$'+shockCPM.toFixed(3)+'/m</span></div>';}selectedDrillStringItems.forEach(item=>{const cpm=item.cost&&item.lifeMetres?item.cost/item.lifeMetres:0;dsCPM+=cpm;totalLength+=item.length||0;});if(dsCPM>0)costHTML+='<div class="flex justify-between text-cyan-400"><span>Components:</span><span>$'+dsCPM.toFixed(3)+'/m</span></div>';const totalCPM=hammerCPM+bitCPM+pipeCPM+shockCPM+dsCPM;costHTML+='<div class="border-t border-gray-600 pt-1 mt-1 flex justify-between font-bold text-orange-400"><span>TOTAL:</span><span>$'+totalCPM.toFixed(2)+'/m</span></div>';document.getElementById('costAnalysis').innerHTML=costHTML||'<p class="text-gray-400">Select components</p>';document.getElementById('totalCost').textContent='$'+totalCPM.toFixed(2)+' / metre';document.getElementById('totalLength').textContent=(totalLength/1000).toFixed(2)+' m';
 
-// BAILING VELOCITY
+// BAILING VELOCITY - Air passes THROUGH hammer and up annulus for bailing
 let bailingVelocity=0,bvCalcDetail='';
-if(selectedHammer&&selectedPipe&&holeDia){const hammerCFM=selectedHammer.airConsumption||0,cfmAvailable=rig.cfm-hammerCFM,pipeODmm=selectedPipe.od||114,pipeODInch=pipeODmm/25.4,holeDiaInch=holeDia/25.4,holeArea=Math.PI*Math.pow(holeDiaInch,2)/4,pipeArea=Math.PI*Math.pow(pipeODInch,2)/4,annularArea=holeArea-pipeArea;if(annularArea>0){bailingVelocity=Math.round((cfmAvailable*144)/annularArea);}bvCalcDetail='('+cfmAvailable+' CFM × 144) ÷ '+annularArea.toFixed(2)+' in² = '+bailingVelocity+' fpm';}
+if(selectedHammer&&selectedPipe&&holeDia){const pipeODmm=selectedPipe.od||114,pipeODInch=pipeODmm/25.4,holeDiaInch=holeDia/25.4,holeArea=Math.PI*Math.pow(holeDiaInch,2)/4,pipeArea=Math.PI*Math.pow(pipeODInch,2)/4,annularArea=holeArea-pipeArea;if(annularArea>0){bailingVelocity=Math.round((rig.cfm*144)/annularArea);}bvCalcDetail='('+rig.cfm+' CFM × 144) ÷ '+annularArea.toFixed(2)+' in² = '+bailingVelocity+' fpm';}
 document.getElementById('bvValue').textContent=bailingVelocity.toLocaleString()+' fpm';document.getElementById('bvCalcDetail').textContent=bvCalcDetail;let bvStatus='',bvColor='bg-gray-500';if(bailingVelocity===0){bvStatus='— Select hammer & pipe';}else if(bailingVelocity<5000){bvStatus='⚠️ LOW';bvColor='bg-red-500';}else if(bailingVelocity<7000){bvStatus='⚡ MARGINAL';bvColor='bg-yellow-500';}else if(bailingVelocity<9000){bvStatus='✓ OPTIMAL';bvColor='bg-green-500';}else{bvStatus='✓ EXCELLENT';bvColor='bg-blue-500';}document.getElementById('bvStatus').innerHTML='<span class="'+bvColor.replace('bg-','text-')+'">'+bvStatus+'</span>';document.getElementById('bvBar').className='h-2 rounded '+bvColor;document.getElementById('bvBar').style.width=Math.min(100,Math.max(0,(bailingVelocity-3000)/80))+'%';
 
 // EFFICIENCY - Adjusted for more realistic values
@@ -409,22 +409,22 @@ const hammerSub=selectedDrillStringItems.find(i=>i.type?.toLowerCase().includes(
 const shock=selectedDrillStringItems.find(i=>i.type?.toLowerCase().includes('shock'));
 const deckBushes=selectedDrillStringItems.filter(i=>i.type?.toLowerCase().includes('deck')||i.name?.toLowerCase().includes('deck'));
 
-if(spindle)ordered.push({name:'SCS/Spindle',pn:spindle.partNumber,sym:'spindle',h:40});
-if(saverSub)ordered.push({name:'Saver Sub',pn:saverSub.partNumber,sym:'sub',h:35});
-if(selectedPipe)ordered.push({name:'DRILL PIPE',pn:selectedPipe.partNumber,sym:'pipe',h:80});
+if(spindle)ordered.push({name:'SCS/Spindle',pn:spindle.partNumber,sym:'spindle',h:30});
+if(saverSub)ordered.push({name:'Saver Sub',pn:saverSub.partNumber,sym:'sub',h:25});
+if(selectedPipe)ordered.push({name:'DRILL PIPE',pn:selectedPipe.partNumber,sym:'pipe',h:60});
 // SHOCK SUB - now uses proper symbol
-if(shockSubEnabled)ordered.push({name:'Shock Absorber',pn:'RP550',sym:'shock',h:65});
-else if(shock)ordered.push({name:'Shock Absorber',pn:shock.partNumber,sym:'shock',h:65});
-if(hammerSub)ordered.push({name:'Hammer Sub',pn:hammerSub.partNumber,sym:'sub',h:35});
-if(selectedHammer)ordered.push({name:'HAMMER',pn:selectedHammer.partNumber,sym:'hammer',h:60});
-if(selectedBit)ordered.push({name:'BIT',pn:selectedBit.partNumber,sym:'bit',h:55});
-deckBushes.forEach(db=>ordered.push({name:db.name?.toLowerCase().includes('inner')?'Deck Bush Inner':'Deck Bush Outer',pn:db.partNumber,sym:'deckbush',h:25}));
+if(shockSubEnabled)ordered.push({name:'Shock Absorber',pn:'RP550',sym:'shock',h:45});
+else if(shock)ordered.push({name:'Shock Absorber',pn:shock.partNumber,sym:'shock',h:45});
+if(hammerSub)ordered.push({name:'Hammer Sub',pn:hammerSub.partNumber,sym:'sub',h:25});
+if(selectedHammer)ordered.push({name:'HAMMER',pn:selectedHammer.partNumber,sym:'hammer',h:45});
+if(selectedBit)ordered.push({name:'BIT',pn:selectedBit.partNumber,sym:'bit',h:40});
+deckBushes.forEach(db=>ordered.push({name:db.name?.toLowerCase().includes('inner')?'Deck Bush Inner':'Deck Bush Outer',pn:db.partNumber,sym:'deckbush',h:20}));
 
 let h='';
-ordered.forEach(comp=>{h+='<div style="width:90px;min-height:'+comp.h+'px;background:#555;color:white;margin:3px 0;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px;border:1px solid #444;"><svg style="width:40px;height:'+Math.min(comp.h-15,50)+'px;fill:#ccc;"><use href="#sym-'+comp.sym+'"/></svg><div style="font-size:7pt;font-weight:bold;margin-top:2px;">'+comp.name+'</div><div style="font-size:6pt;color:#bbb;">'+(comp.pn||'')+'</div></div>';});
+ordered.forEach(comp=>{h+='<div style="width:70px;min-height:'+comp.h+'px;background:#555;color:white;margin:2px 0;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px;border:1px solid #444;"><svg style="width:30px;height:'+Math.min(comp.h-12,38)+'px;fill:#ccc;"><use href="#sym-'+comp.sym+'"/></svg><div style="font-size:6pt;font-weight:bold;margin-top:1px;">'+comp.name+'</div><div style="font-size:5pt;color:#bbb;">'+(comp.pn||'')+'</div></div>';});
 c.innerHTML=h||'<div style="color:#999;padding:20px;">No components selected</div>';}
 
-function updatePrintComponentDetails(){const c=document.getElementById('printComponentDetails');let h='<div style="font-weight:bold;border-bottom:1px solid #333;margin-bottom:5px;font-size:8pt;">DTH DRILL STRING</div>';const items=[];selectedDrillStringItems.forEach(item=>items.push({title:(item.type||item.name).toUpperCase(),pn:item.partNumber,top:item.topThread,bot:item.bottomThread,wt:item.weight,len:item.length,od:item.od}));if(selectedPipe)items.push({title:'DRILL PIPE',pn:selectedPipe.partNumber,top:selectedPipe.topThread,bot:selectedPipe.bottomThread,wt:selectedPipe.weight,len:selectedPipe.length,od:selectedPipe.od,id:selectedPipe.innerDia});if(shockSubEnabled)items.push({title:'SHOCK ABSORBER',pn:'RP550',top:'API 3-1/2" Reg Pin',bot:'API 3-1/2" Reg Box',wt:45,len:850});if(selectedHammer)items.push({title:selectedHammer.size+'" HAMMER',pn:selectedHammer.partNumber,top:selectedHammer.topSub,bot:selectedHammer.shank,wt:selectedHammer.weight,len:selectedHammer.length,od:selectedHammer.od});if(selectedBit)items.push({title:selectedBit.diameter+'mm BIT',pn:selectedBit.partNumber,shank:selectedBit.shank,carbide:selectedBit.carbide,wt:selectedBit.weight,dia:selectedBit.diameter});items.forEach(item=>{h+='<div style="border:1px solid #999;padding:3px;margin-bottom:4px;background:#f8f8f8;font-size:7pt;"><div style="font-weight:bold;border-bottom:1px solid #ddd;margin-bottom:2px;">'+item.title+'</div><table style="width:100%;font-size:6pt;"><tr><td style="width:40%;">PART NUMBER</td><td>'+(item.pn||'-')+'</td></tr>'+(item.od?'<tr><td>OD</td><td>Ø'+item.od+'mm</td></tr>':'')+(item.id?'<tr><td>ID</td><td>Ø'+item.id+'mm</td></tr>':'')+(item.dia?'<tr><td>DIAMETER</td><td>Ø'+item.dia+'mm</td></tr>':'')+(item.top?'<tr><td>TOP THREAD</td><td>'+item.top+'</td></tr>':'')+(item.bot?'<tr><td>BOTTOM THREAD</td><td>'+item.bot+'</td></tr>':'')+(item.shank?'<tr><td>SHANK</td><td>'+item.shank+'</td></tr>':'')+(item.carbide?'<tr><td>CARBIDE</td><td>'+item.carbide+'</td></tr>':'')+(item.wt?'<tr><td>WEIGHT</td><td>'+item.wt+'kg</td></tr>':'')+(item.len?'<tr><td>LENGTH</td><td>'+item.len+'mm</td></tr>':'')+'</table></div>';});c.innerHTML=h;}
+function updatePrintComponentDetails(){const c=document.getElementById('printComponentDetails');let h='<div style="font-weight:bold;border-bottom:1px solid #333;margin-bottom:3px;font-size:7pt;">DTH DRILL STRING COMPONENTS</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;">';const items=[];selectedDrillStringItems.forEach(item=>items.push({title:(item.type||item.name).toUpperCase(),pn:item.partNumber,top:item.topThread,bot:item.bottomThread,wt:item.weight,len:item.length,od:item.od}));if(selectedPipe)items.push({title:'DRILL PIPE',pn:selectedPipe.partNumber,top:selectedPipe.topThread,bot:selectedPipe.bottomThread,wt:selectedPipe.weight,len:selectedPipe.length,od:selectedPipe.od,id:selectedPipe.innerDia});if(shockSubEnabled)items.push({title:'SHOCK ABSORBER',pn:'RP550',top:'API 3-1/2" Reg Pin',bot:'API 3-1/2" Reg Box',wt:45,len:850});if(selectedHammer)items.push({title:selectedHammer.size+'" HAMMER',pn:selectedHammer.partNumber,top:selectedHammer.topSub,bot:selectedHammer.shank,wt:selectedHammer.weight,len:selectedHammer.length,od:selectedHammer.od});if(selectedBit)items.push({title:selectedBit.diameter+'mm BIT',pn:selectedBit.partNumber,shank:selectedBit.shank,carbide:selectedBit.carbide,wt:selectedBit.weight,dia:selectedBit.diameter});items.forEach(item=>{h+='<div style="border:1px solid #999;padding:2px;background:#f8f8f8;font-size:6pt;"><div style="font-weight:bold;border-bottom:1px solid #ddd;margin-bottom:1px;font-size:6pt;">'+item.title+'</div><div style="line-height:1.3;"><div>PN: '+(item.pn||'-')+'</div>'+(item.od?'<div>OD: Ø'+item.od+'mm</div>':'')+(item.dia?'<div>Dia: Ø'+item.dia+'mm</div>':'')+(item.top?'<div>Top: '+item.top+'</div>':'')+(item.bot?'<div>Bot: '+item.bot+'</div>':'')+(item.shank?'<div>Shank: '+item.shank+'</div>':'')+(item.len?'<div>Len: '+item.len+'mm</div>':'')+'</div></div>';});c.innerHTML=h+'</div>';}
 
 document.getElementById('logoUrl')?.addEventListener('input',function(){if(this.value){document.getElementById('logoPreviewImg').src=this.value;document.getElementById('logoPreview').classList.remove('hidden');}else{document.getElementById('logoPreview').classList.add('hidden');}});
 </script>
